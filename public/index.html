@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ZONE DATA HUB</title>
+<!-- Firebase SDKs -->
+<script src="https://gstatic.com"></script>
+<script src="https://gstatic.com"></script>
+<script src="https://gstatic.com"></script>
+
+<link href="https://googleapis.com" rel="stylesheet"/>
+<style>
+/* PRESERVING ALL YOUR ORIGINAL CSS STYLES */
+:root{--bg:#06080f;--bg2:#0d1120;--bg3:#111827;--card:rgba(255,255,255,0.04);--card-border:rgba(255,255,255,0.08);--text:#f0f4ff;--text2:#8b98b8;--accent:#00d4ff;--accent2:#7c3aed;--accent3:#f59e0b;--mtn:#ffcc00;--telecel:#e11d48;--glow:0 0 40px rgba(0,212,255,0.15);--radius:16px;--transition:0.3s cubic-bezier(0.4,0,0.2,1);}
+[data-theme="light"]{--bg:#f0f4ff;--bg2:#e8edf8;--bg3:#dde3f0;--card:rgba(255,255,255,0.7);--card-border:rgba(0,0,0,0.1);--text:#0f172a;--text2:#475569;--glow:0 0 40px rgba(124,58,237,0.1);}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background var(--transition),color var(--transition);}
+
+/* DASHBOARD & MODAL STYLES */
+#auth-modal, #admin-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center; backdrop-filter:blur(10px); }
+.modal-content { background:var(--bg2); padding:2.5rem; border-radius:var(--radius); border:1px solid var(--card-border); width:95%; max-width:420px; position:relative; }
+.input-group input { width:100%; padding:1rem; border-radius:8px; border:1px solid var(--card-border); background:rgba(255,255,255,0.05); color:white; margin-bottom:12px; font-family:'DM Sans'; }
+#user-panel { display:none; padding:30px; border-radius:var(--radius); background:var(--card); border:1px solid var(--accent); margin-top:20px; text-align:center; box-shadow:var(--glow); }
+.wallet-val { font-size:3rem; font-family:'Orbitron'; color:var(--accent); margin:15px 0; letter-spacing:1px; }
+.admin-badge { position:fixed; bottom:20px; left:20px; font-size:10px; color:var(--text2); cursor:pointer; opacity:0.4; letter-spacing:2px; font-family:'Orbitron'; }
+.status-success { color:#22c55e; font-weight:bold; }
+
+/* NAV & BUTTONS */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 5%;height:75px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,8,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--card-border);}
+.logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.3rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;}
+.btn{padding:0.7rem 1.5rem;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700;transition:all var(--transition);text-transform:uppercase;font-size:0.85rem;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 10px 20px -10px var(--accent);}
+.btn-ghost{background:transparent;border:1px solid var(--card-border);color:var(--text);}
+.btn-warn{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;}
+</style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">ZONE DATA HUB</div>
+    <ul style="display:flex; gap:25px; list-style:none; align-items:center;">
+        <li id="login-nav"><button class="btn btn-ghost" onclick="openAuth()">Login</button></li>
+        <li id="logout-nav" style="display:none;"><button class="btn btn-warn" onclick="handleLogout()">Logout</button></li>
+    </ul>
+</nav>
+
+<section id="hero" style="padding-top:140px; display:flex; justify-content:center; min-height:90vh;">
+    <div style="max-width:700px; width:90%; text-align:center;">
+        
+        <!-- PERSONAL DASHBOARD SECTION -->
+        <div id="user-panel">
+            <h2 style="font-family:'Syne'; color:var(--text2); font-size:1rem; text-transform:uppercase; letter-spacing:3px;">My Wallet Balance</h2>
+            <div class="wallet-val" id="wallet-amt">GH₵ 0.00</div>
+            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:25px;">
+                 <button class="btn btn-primary">Buy Data</button>
+                 <button class="btn btn-ghost">Top Up</button>
+            </div>
+            <hr style="border:0.5px solid var(--card-border); margin:25px 0;">
+            <h3 style="font-family:'Syne'; margin-bottom:15px; text-align:left;">Order History & Status</h3>
+            <div id="order-status-list" style="text-align:left; background:rgba(0,0,0,0.2); border-radius:10px; padding:15px;"></div>
+        </div>
+
+        <!-- MAIN HERO CONTENT (Only shows when logged out) -->
+        <div id="hero-main">
+            <h1 style="font-family:'Syne'; font-size:clamp(2.5rem, 8vw, 4.5rem); font-weight:900; line-height:1.1;">Ghana's #1 <br><span style="background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Data Hub</span></h1>
+            <p style="color:var(--text2); margin:30px auto; max-width:450px; font-size:1.1rem; line-height:1.6;">Instant delivery. Zero delays. Join thousands of Ghanians getting the cheapest data bundles daily.</p>
+            <div style="display:flex; justify-content:center; gap:15px;">
+                <button class="btn btn-primary" style="padding:1rem 2.5rem;" onclick="openAuth()">Join Now</button>
+                <button class="btn btn-ghost" style="padding:1rem 2.5rem;">View Rates</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AUTHENTICATION MODAL -->
+<div id="auth-modal">
+    <div class="modal-content">
+        <h2 style="font-family:'Syne'; margin-bottom:1.5rem;">Access Account</h2>
+        <div class="input-group"><input type="email" id="auth-email" placeholder="Email Address"></div>
+        <div class="input-group"><input type="password" id="auth-pass" placeholder="Secure Password"></div>
+        <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="handleAuth('login')">Login to Dashboard</button>
+        <button class="btn btn-ghost" style="width:100%; margin-top:10px;" onclick="handleAuth('signup')">Create Account</button>
+        <div style="margin:20px 0; text-align:center; color:var(--text2); font-size:0.8rem;">OR</div>
+        <button class="btn btn-primary" style="width:100%; background:#db4437; box-shadow:none;" onclick="loginGoogle()">Sign-In with Google</button>
+        <button class="btn btn-ghost" style="width:100%; margin-top:20px; border:none;" onclick="closeAuth()">Cancel</button>
+    </div>
+</div>
+
+<!-- ADMIN GATEWAY MODAL -->
+<div id="admin-modal">
+    <div class="modal-content">
+        <h2 style="font-family:'Syne';">System Admin</h2>
+        <p style="color:var(--text2); font-size:0.8rem; margin-bottom:20px;">Enter secret password to manage orders.</p>
+        <div class="input-group"><input type="password" id="admin-secret" placeholder="Admin Secret"></div>
+        <button class="btn btn-primary" style="width:100%;" onclick="verifyAdmin()">Unlock Panel</button>
+        <div id="admin-orders-view" style="display:none; margin-top:25px; max-height:350px; overflow-y:auto; border-top:1px solid var(--card-border); padding-top:15px;"></div>
+        <button class="btn btn-ghost" style="width:100%; margin-top:15px;" onclick="closeAdmin()">Exit</button>
+    </div>
+</div>
+
+<span class="admin-badge" onclick="openAdmin()">DEVELOPER ACCESS</span>
+
+<script>
+// --- 1. FIREBASE CONFIGURATION (Replace with your actual keys) ---
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_://firebaseapp.com",
+    databaseURL: "https://firebasedatabase.app",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_://appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+// --- 2. WHATSAPP NOTIFICATION FUNCTIONS ---
+function notifyOrderWhatsApp(order) {
+    const phones = ["233531861148", "233537172705"];
+    const text = `🚀 *New Data Order!*\n📦 *Data:* ${order.packageName}\n💰 *Price:* GH₵${order.amount}\n🆔 *Order:* ${order.id}\n👤 *User:* ${firebase.auth().currentUser.email}`;
+    window.open(`https://wa.me{phones[0]}?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+async function reportToWhatsApp(id, problem) {
+    const phones = ["233537172705", "233531861148"];
+    const snap = await firebase.database().ref(`orders/${id}`).once('value');
+    const data = snap.val() || {};
+    const text = `⚠️ *Support Issue Reported*\n🆔 *Order ID:* ${id}\n📦 *Package:* ${data.packageName || 'Unknown'}\n🗓️ *Date:* ${data.date || 'Unknown'}\n📝 *Problem:* ${problem}`;
+    window.open(`https://wa.me{phones[0]}?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+// --- 3. CORE AUTHENTICATION LOGIC ---
+function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
+function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
+
+async function handleAuth(type) {
+    const e = document.getElementById('auth-email').value;
+    const p = document.getElementById('auth-pass').value;
+    try {
+        if(type === 'signup') await auth.createUserWithEmailAndPassword(e,p);
+        else await auth.signInWithEmailAndPassword(e,p);
+        closeAuth();
+    } catch(err) { alert("System Error: " + err.message); }
+}
+
+async function loginGoogle() {
+    try {
+        await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+        closeAuth();
+    } catch(err) { alert(err.message); }
+}
+
+function handleLogout() { auth.signOut().then(() => location.reload()); }
+
+// --- 4. DASHBOARD SYNC (REALTIME UPDATE) ---
+auth.onAuthStateChanged(user => {
+    if(user) {
+        document.getElementById('login-nav').style.display = 'none';
+        document.getElementById('logout-nav').style.display = 'block';
+        document.getElementById('hero-main').style.display = 'none';
+        document.getElementById('user-panel').style.display = 'block';
+        syncUserDashboard(user.uid);
+    }
+});
+
+function syncUserDashboard(uid) {
+    db.ref(`users/${uid}/wallet`).on('value', s => {
+        const bal = s.val() || 0;
+        document.getElementById('wallet-amt').innerText = `GH₵ ${bal.toFixed(2)}`;
+    });
+    db.ref(`orders`).on('value', s => {
+        const list = document.getElementById('order-status-list');
+        list.innerHTML = '';
+        s.forEach(c => {
+            const o = c.val();
+            if(o.uid === uid) {
+                const statusHtml = o.status === 'Delivered' ? '<span class="status-success">✅ Delivered</span>' : '⏳ Processing...';
+                list.innerHTML += `<div style="padding:10px; border-bottom:1px solid var(--card-border); font-size:0.9rem;">
+                    <strong>${o.packageName}</strong><br>${statusHtml}
+                </div>`;
+            }
+        });
+    });
+}
+
+// --- 5. ADMIN PANEL LOGIC (WITH YOUR SECURE PASSWORD) ---
+const ADMIN_PASS = "ZONEHUB@ADMIN0504839130#SECURE"; 
+function openAdmin() { document.getElementById('admin-modal').style.display = 'flex'; }
+function closeAdmin() { document.getElementById('admin-modal').style.display = 'none'; }
+
+function verifyAdmin() {
+    if(document.getElementById('admin-secret').value === ADMIN_PASS) {
+        document.getElementById('admin-orders-view').style.display = 'block';
+        loadAllOrdersForAdmin();
+    } else { alert("Access Denied: Wrong Password."); }
+}
+
+function loadAllOrdersForAdmin() {
+    db.ref('orders').on('value', s => {
+        const view = document.getElementById('admin-orders-view');
+        view.innerHTML = '';
+        s.forEach(c => {
+            const o = c.val();
+            if(o.status !== 'Delivered') {
+                view.innerHTML += `<div style="padding:12px; background:rgba(255,255,255,0.05); margin-bottom:10px; border-radius:8px; font-size:0.8rem;">
+                    <strong>${o.email}</strong> bought ${o.packageName}<br>
+                    <button class="btn btn-primary" style="font-size:0.7rem; margin-top:8px; padding:5px 10px;" onclick="markOrderDelivered('${c.key}')">Mark Delivered</button>
+                </div>`;
+            }
+        });
+    });
+}
+
+async function markOrderDelivered(id) {
+    await db.ref(`orders/${id}`).update({ status: 'Delivered' });
+    alert("Success: User dashboard updated.");
+}
+</script>
+</body>
+</html>
