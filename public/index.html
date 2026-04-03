@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ZONE DATA HUB</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<!-- CORRECT Firebase URLs — wrong URLs were causing the blank page -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+:root{--bg:#06080f;--bg2:#0d1120;--bg3:#111827;--card:rgba(255,255,255,0.04);--cb:rgba(255,255,255,0.08);--text:#f0f4ff;--t2:#8b98b8;--ac:#00d4ff;--ac2:#7c3aed;--ac3:#f59e0b;--mtn:#ffcc00;--tel:#e11d48;--r:16px;--tr:0.3s cubic-bezier(0.4,0,0.2,1);}
+[data-theme="light"]{--bg:#f0f4ff;--bg2:#e8edf8;--bg3:#dde3f0;--card:rgba(255,255,255,0.7);--cb:rgba(0,0,0,0.1);--text:#0f172a;--t2:#475569;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+.bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(0,212,255,0.08),transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(124,58,237,0.08),transparent 60%);}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:60px 60px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 5%;height:70px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,8,15,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--cb);}
+[data-theme="light"] nav{background:rgba(240,244,255,0.88);}
+.logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.2rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;cursor:pointer;border:none;}
+.nav-links{display:flex;gap:1.8rem;list-style:none;align-items:center;}
+.nav-links a{color:var(--t2);text-decoration:none;font-size:0.9rem;font-weight:500;}
+.nav-links a:hover{color:var(--ac);}
+.nav-right{display:flex;align-items:center;gap:0.75rem;}
+.tw{display:flex;align-items:center;gap:0.4rem;}
+.tl{font-size:0.75rem;color:var(--t2);}
+.tt{width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;background:var(--cb);position:relative;outline:none;flex-shrink:0;}
+.tt::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--ac);transition:transform var(--tr);}
+[data-theme="light"] .tt::after{transform:translateX(20px);background:var(--ac2);}
+#abtns{display:flex;gap:0.5rem;align-items:center;}
+.btn{padding:0.55rem 1.3rem;border-radius:9px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;transition:all var(--tr);}
+.bp{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;}
+.bp:hover{transform:translateY(-2px);}
+.bg2b{background:transparent;border:1px solid var(--cb);color:var(--text);}
+.bg2b:hover{border-color:var(--ac);color:var(--ac);}
+.bw{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;}
+.goog{width:100%;padding:0.75rem;border-radius:10px;border:1px solid var(--cb);background:var(--card);color:var(--text);cursor:pointer;font-weight:600;font-size:0.9rem;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:0.6rem;}
+.goog:hover{border-color:var(--ac);}
+.bord{width:100%;padding:0.6rem;border-radius:8px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-weight:700;font-size:0.85rem;font-family:'DM Sans',sans-serif;}
+.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
+.ham span{width:22px;height:2px;background:var(--text);border-radius:2px;}
+section{position:relative;z-index:1;}
+#hero{min-height:100vh;display:flex;align-items:center;padding:100px 5% 60px;}
+.hi{max-width:700px;}
+.hbadge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.35rem 1rem;border-radius:20px;margin-bottom:1.5rem;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);font-size:0.8rem;color:var(--ac);font-weight:600;}
+.pd{width:6px;height:6px;border-radius:50%;background:var(--ac);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.5);}}
+.ht{font-family:'Syne',sans-serif;font-size:clamp(2.4rem,6vw,4.8rem);font-weight:900;line-height:1.05;margin-bottom:1.5rem;}
+.hl{background:linear-gradient(135deg,var(--ac),var(--ac2),var(--ac3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hs{font-size:1.05rem;color:var(--t2);max-width:500px;line-height:1.7;margin-bottom:2.5rem;}
+.hc{display:flex;gap:1rem;flex-wrap:wrap;}
+.hc .btn{padding:0.85rem 2.2rem;font-size:1rem;}
+.hst{display:flex;gap:2.5rem;margin-top:3rem;flex-wrap:wrap;}
+.sv{border-left:2px solid var(--ac);padding-left:1rem;}
+.sn{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:700;color:var(--ac);}
+.sl{font-size:0.78rem;color:var(--t2);margin-top:0.2rem;}
+#how{padding:80px 5%;text-align:center;}
+.stag{font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:3px;color:var(--ac);margin-bottom:1rem;}
+.stit{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:800;margin-bottom:1rem;}
+.ssub{color:var(--t2);max-width:500px;margin:0 auto 3rem;line-height:1.7;}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;max-width:1000px;margin:0 auto;}
+.sc{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:2rem 1.5rem;text-align:left;position:relative;overflow:hidden;transition:transform var(--tr),border-color var(--tr);}
+.sc:hover{transform:translateY(-4px);border-color:var(--ac);}
+.scn{font-family:'Orbitron',sans-serif;font-size:2.5rem;font-weight:900;color:var(--ac);opacity:0.12;position:absolute;top:1rem;right:1rem;}
+.sic{font-size:2rem;margin-bottom:1rem;}
+.stl{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.5rem;}
+.sds{color:var(--t2);font-size:0.875rem;line-height:1.6;}
+#plans{padding:80px 5%;}
+.ptabs{display:flex;gap:0.5rem;justify-content:center;margin-bottom:2.5rem;}
+.tbtn{padding:0.6rem 2rem;border-radius:8px;border:1px solid var(--cb);background:transparent;color:var(--t2);cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;font-size:0.9rem;transition:all var(--tr);}
+.tbtn.active{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-color:transparent;}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:1.2rem;max-width:1100px;margin:0 auto;}
+.pc{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:1.5rem;text-align:center;transition:all var(--tr);position:relative;}
+.pc:hover{transform:translateY(-5px);box-shadow:0 0 40px rgba(0,212,255,0.15);border-color:var(--ac);}
+.pbdg{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--ac3);color:#000;font-size:0.65rem;font-weight:700;padding:0.2rem 0.8rem;border-radius:10px;white-space:nowrap;}
+.pnet{font-size:0.75rem;font-weight:700;letter-spacing:2px;margin-bottom:0.5rem;}
+.pnet.mtn{color:var(--mtn);}.pnet.tel{color:var(--tel);}
+.psz{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:700;line-height:1;}
+.ppr{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--ac);margin:0.5rem 0 1rem;}
+.ppr span{font-size:0.8rem;color:var(--t2);font-weight:400;}
+#reviews{padding:80px 5%;text-align:center;}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:1100px;margin:0 auto;}
+.rc{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:2rem;text-align:left;transition:transform var(--tr),border-color var(--tr);}
+.rc:hover{transform:translateY(-4px);border-color:var(--ac2);}
+.rst{color:var(--ac3);font-size:1rem;margin-bottom:1rem;}
+.rtx{color:var(--t2);font-size:0.9rem;line-height:1.7;margin-bottom:1.5rem;font-style:italic;}
+.rau{display:flex;align-items:center;gap:0.75rem;}
+.rav{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;}
+.rnm{font-weight:700;font-size:0.9rem;}.rlc{font-size:0.75rem;color:var(--t2);}
+#support{padding:80px 5%;}
+.supgrid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:1100px;margin:0 auto;align-items:start;}
+.cbox{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);overflow:hidden;}
+.chdr{padding:1.2rem 1.5rem;background:linear-gradient(135deg,var(--ac2),var(--ac));display:flex;align-items:center;gap:0.75rem;}
+.cav{width:36px;height:36px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.cnm{font-weight:700;color:#fff;font-size:0.95rem;}.cst{font-size:0.75rem;color:rgba(255,255,255,0.7);}
+.con{width:8px;height:8px;border-radius:50%;background:#4ade80;margin-left:auto;}
+.cmsgs{height:300px;overflow-y:auto;padding:1.2rem;display:flex;flex-direction:column;gap:0.75rem;}
+.msg{max-width:85%;padding:0.7rem 1rem;border-radius:14px;font-size:0.875rem;line-height:1.5;}
+.mai{background:var(--bg3);border-bottom-left-radius:4px;align-self:flex-start;}
+.mu{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+.ciw{padding:1rem;border-top:1px solid var(--cb);display:flex;gap:0.5rem;}
+.ci{flex:1;background:var(--bg3);border:1px solid var(--cb);border-radius:10px;padding:0.65rem 1rem;color:var(--text);font-size:0.875rem;outline:none;font-family:'DM Sans',sans-serif;}
+.cs{padding:0.65rem 1rem;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-weight:700;}
+.ccard{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:2rem;}
+.cit{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--cb);}
+.cit:last-child{border-bottom:none;}
+.cion{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.clb{font-size:0.8rem;color:var(--t2);margin-bottom:0.2rem;}.cvl{font-weight:600;font-size:0.95rem;}
+footer{position:relative;z-index:1;padding:3rem 5% 2rem;border-top:1px solid var(--cb);text-align:center;}
+.flogo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.1rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.75rem;}
+.ftxt{color:var(--t2);font-size:0.83rem;}
+/* DASHBOARD PANEL */
+.dp{position:fixed;top:70px;right:0;bottom:0;width:min(720px,100vw);background:var(--bg2);border-left:1px solid var(--cb);z-index:900;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;box-shadow:-10px 0 40px rgba(0,0,0,0.4);}
+.dp.open{transform:translateX(0);}
+.dpi{padding:1.5rem 1.5rem 3rem;position:relative;min-height:100%;}
+.dbk{position:fixed;inset:0;top:70px;background:rgba(0,0,0,0.4);z-index:899;display:none;backdrop-filter:blur(2px);}
+.dbk.open{display:block;}
+.dph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.2rem;padding-bottom:1.2rem;border-bottom:1px solid var(--cb);}
+.ctb{padding:0.5rem 1.2rem;border-radius:8px;border:1px solid var(--cb);background:transparent;color:var(--t2);cursor:pointer;font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.ctb:hover{border-color:var(--ac);color:var(--ac);}
+.abg{display:inline-flex;align-items:center;padding:0.25rem 0.8rem;border-radius:20px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);color:var(--ac);font-size:0.72rem;font-weight:700;letter-spacing:1px;margin-bottom:0.4rem;}
+/* Loading overlay */
+#dao{position:absolute;inset:0;background:var(--bg2);z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;}
+#dao.show{display:flex!important;}
+.spin{width:50px;height:50px;border:4px solid var(--cb);border-top-color:var(--ac);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:1.5rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.dr{display:flex;gap:6px;justify-content:center;margin:0.75rem 0;}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--ac);animation:da 1.4s ease-in-out infinite;}
+.dot:nth-child(2){animation-delay:0.2s;}.dot:nth-child(3){animation-delay:0.4s;}
+@keyframes da{0%,80%,100%{transform:scale(0.6);opacity:0.4;}40%{transform:scale(1);opacity:1;}}
+/* Pre-login */
+.plt{font-family:'Orbitron',sans-serif;font-size:0.72rem;letter-spacing:2px;font-weight:700;margin-bottom:0.75rem;text-transform:uppercase;}
+.plt.si{color:var(--ac);}.plt.ca{color:var(--ac2);}
+.dl{height:1px;background:var(--cb);margin:1.2rem 0;}
+/* Dash nav */
+.dn{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+.dnb{padding:0.5rem 0.9rem;border-radius:8px;border:1px solid var(--cb);background:transparent;color:var(--t2);cursor:pointer;font-size:0.82rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
+.dnb:hover,.dnb.active{background:var(--ac);color:#000;border-color:transparent;}
+.lob{color:#ef4444!important;}.lob:hover{background:#ef4444!important;color:#fff!important;}
+.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.2rem;}
+.dc{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:1.4rem;}
+.dct{font-size:0.78rem;font-weight:600;color:var(--t2);margin-bottom:0.5rem;letter-spacing:1px;text-transform:uppercase;}
+.dcv{font-family:'Orbitron',sans-serif;font-size:1.9rem;font-weight:700;color:var(--ac);}
+.ds{display:none;}.ds.active{display:block;}
+.ow{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);overflow:hidden;margin-top:0.5rem;}
+.oh{padding:1rem 1.4rem;border-bottom:1px solid var(--cb);font-family:'Syne',sans-serif;font-weight:700;}
+.ts{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{padding:0.7rem 1rem;text-align:left;font-size:0.78rem;color:var(--t2);border-bottom:1px solid var(--cb);}
+td{padding:0.7rem 1rem;font-size:0.85rem;border-bottom:1px solid rgba(255,255,255,0.04);}
+.sb{padding:0.2rem 0.65rem;border-radius:20px;font-size:0.73rem;font-weight:700;}
+.sp{background:rgba(245,158,11,0.15);color:var(--ac3);}
+.spr{background:rgba(0,212,255,0.15);color:var(--ac);}
+.sd{background:rgba(16,185,129,0.15);color:#10b981;}
+.tkb{padding:0.3rem 0.8rem;border-radius:6px;border:none;cursor:pointer;background:rgba(16,185,129,0.15);color:#10b981;font-size:0.75rem;font-weight:700;font-family:'DM Sans',sans-serif;}
+.tkb:hover{background:#10b981;color:#fff;}
+/* Forms */
+.fg{margin-bottom:1.1rem;}
+.fl{font-size:0.83rem;font-weight:600;color:var(--t2);margin-bottom:0.35rem;display:block;}
+.fi{width:100%;padding:0.8rem 1rem;border-radius:10px;background:var(--bg3);border:1px solid var(--cb);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;outline:none;}
+.fi:focus{border-color:var(--ac);}
+.fi::placeholder{color:var(--t2);}
+.pw{position:relative;}.pw .fi{padding-right:3rem;}
+.pe{position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:0.85rem;padding:0;}
+.ae{color:#ef4444;font-size:0.8rem;margin-top:0.4rem;display:none;}
+.ci2{width:100%;padding:1rem;border-radius:10px;background:var(--bg3);border:2px solid var(--cb);color:var(--text);font-family:'Orbitron',sans-serif;font-size:1.5rem;outline:none;text-align:center;letter-spacing:8px;}
+.ci2:focus{border-color:var(--ac);}
+.rb{background:none;border:none;color:var(--ac);cursor:pointer;font-size:0.85rem;font-family:'DM Sans',sans-serif;text-decoration:underline;margin-top:0.75rem;}
+/* Modals */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:2000;display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(8px);}
+.mo.open{display:flex;}
+.md{background:var(--bg2);border:1px solid var(--cb);border-radius:20px;padding:2.5rem;max-width:440px;width:100%;position:relative;animation:su 0.3s ease;max-height:90vh;overflow-y:auto;}
+@keyframes su{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.mc{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--t2);font-size:1.3rem;cursor:pointer;}
+.mt{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:0.3rem;}
+.msb{color:var(--t2);font-size:0.875rem;margin-bottom:1.5rem;}
+.mpk{background:var(--card);border:1px solid var(--cb);border-radius:10px;padding:1rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;}
+.mpp{color:var(--ac);font-family:'Orbitron',sans-serif;font-weight:700;}
+.mb{width:100%;padding:0.9rem;margin-top:0.5rem;}
+.at{display:flex;margin-bottom:1.5rem;border-radius:10px;overflow:hidden;border:1px solid var(--cb);}
+.atb{flex:1;padding:0.7rem;text-align:center;cursor:pointer;font-weight:600;font-size:0.9rem;background:transparent;border:none;color:var(--t2);font-family:'DM Sans',sans-serif;}
+.atb.active{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;}
+.div{text-align:center;color:var(--t2);font-size:0.8rem;margin:1rem 0;position:relative;}
+.div::before,.div::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--cb);}
+.div::before{left:0;}.div::after{right:0;}
+.nh{font-size:0.78rem;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);border-radius:8px;padding:0.5rem 0.75rem;margin-bottom:1rem;color:var(--ac);}
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;background:var(--bg2);border:1px solid var(--cb);border-radius:12px;padding:1rem 1.5rem;max-width:320px;box-shadow:0 10px 40px rgba(0,0,0,0.3);display:none;}
+.toast.show{display:block;animation:ti 0.3s ease;}
+@keyframes ti{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.tt2{font-weight:700;margin-bottom:0.3rem;}.tm{font-size:0.85rem;color:var(--t2);}
+@media(max-width:900px){.supgrid{grid-template-columns:1fr;}}
+@media(max-width:768px){.nav-links{display:none;flex-direction:column;position:absolute;top:70px;left:0;right:0;background:var(--bg2);padding:1rem 5%;border-bottom:1px solid var(--cb);}.nav-links.open{display:flex;}.ham{display:flex;}.ht{font-size:2.2rem;}.pgrid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.pgrid{grid-template-columns:1fr;}}
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+<div class="bg"><div class="bg-grid"></div></div>
+<nav>
+  <button class="logo" onclick="showPublic()">&#x2B21; ZONE DATA HUB</button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#hero">Home</a></li><li><a href="#plans">Data Plans</a></li>
+    <li><a href="#how">How It Works</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#support">Support</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="tw"><span class="tl" id="thl">Dark</span><button class="tt" onclick="toggleTheme()"></button></div>
+    <div id="abtns"><button class="btn bg2b" onclick="openAuth('login')">Login</button><button class="btn bp" onclick="openAuth('register')">Register</button></div>
+    <button class="btn bp" id="mab" onclick="openDash()" style="display:none;">&#x1F464; My Account</button>
+    <button class="ham" onclick="toggleNav()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div id="pv">
+<section id="hero"><div class="hi">
+  <div class="hbadge"><span class="pd"></span>Ghana's #1 Data Bundle Platform</div>
+  <h1 class="ht">Fast. Affordable.<br><span class="hl">Data at Your Fingertips.</span></h1>
+  <p class="hs">Buy MTN &amp; Telecel data bundles instantly. Reliable data delivered right to your number.</p>
+  <div class="hc">
+    <button class="btn bp" onclick="scrollToPlans()">&#x1F525; View Offers</button>
+    <button class="btn bg2b" onclick="openDash()">&#x1F4CA; Dashboard</button>
+  </div>
+  <div class="hst">
+    <div class="sv"><div class="sn">500+</div><div class="sl">Happy Customers</div></div>
+    <div class="sv"><div class="sn">99%</div><div class="sl">Delivery Rate</div></div>
+    <div class="sv"><div class="sn">~30min</div><div class="sl">Avg. Delivery</div></div>
+  </div>
+</div></section>
+
+<section id="how">
+  <p class="stag">THE PROCESS</p><h2 class="stit">How It Works</h2><p class="ssub">Four simple steps and you are connected.</p>
+  <div class="sgrid">
+    <div class="sc"><div class="scn">01</div><div class="sic">&#x1F4E6;</div><div class="stl">Choose a Plan</div><div class="sds">Browse MTN or Telecel bundles and pick what fits your needs.</div></div>
+    <div class="sc"><div class="scn">02</div><div class="sic">&#x1F4F1;</div><div class="stl">Enter Your Number</div><div class="sds">Input the phone number you want data delivered to.</div></div>
+    <div class="sc"><div class="scn">03</div><div class="sic">&#x1F4B3;</div><div class="stl">Make Payment</div><div class="sds">Pay securely via Paystack. Card, mobile money or bank.</div></div>
+    <div class="sc"><div class="scn">04</div><div class="sic">&#x26A1;</div><div class="stl">Data Delivered!</div><div class="sds">Your data bundle is delivered within ~30 minutes.</div></div>
+  </div>
+</section>
+
+<section id="plans">
+  <p class="stag" style="text-align:center;">DATA BUNDLES</p>
+  <h2 class="stit" style="text-align:center;">Explore Plans</h2>
+  <p class="ssub" style="text-align:center;margin:0 auto 2rem;">Best rates in Ghana for MTN and Telecel.</p>
+  <div class="ptabs">
+    <button class="tbtn active" id="tmtn" onclick="switchTab('mtn')">&#x1F4F6; MTN</button>
+    <button class="tbtn" id="ttel" onclick="switchTab('telecel')">&#x1F4E1; Telecel</button>
+  </div>
+  <div id="mp" class="pgrid">
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">1<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;5.50<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','1GB','GH&#8373;5.50',5.50)">Order Now</button></div>
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">2<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;12.00<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','2GB','GH&#8373;12.00',12.00)">Order Now</button></div>
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">3<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;17.50<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','3GB','GH&#8373;17.50',17.50)">Order Now</button></div>
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">4<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;24.50<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','4GB','GH&#8373;24.50',24.50)">Order Now</button></div>
+    <div class="pc"><div class="pbdg">Popular</div><div class="pnet mtn">MTN</div><div class="psz">5<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;29.50<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','5GB','GH&#8373;29.50',29.50)">Order Now</button></div>
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">6<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;35.00<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','6GB','GH&#8373;35.00',35.00)">Order Now</button></div>
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">8<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;49.00<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','8GB','GH&#8373;49.00',49.00)">Order Now</button></div>
+    <div class="pc"><div class="pbdg">Best Value</div><div class="pnet mtn">MTN</div><div class="psz">10<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;57.50<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','10GB','GH&#8373;57.50',57.50)">Order Now</button></div>
+  </div>
+  <div id="tp" class="pgrid hidden">
+    <div class="pc"><div class="pnet tel">TELECEL</div><div class="psz">5<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;28.00<span>/bundle</span></div><button class="bord" onclick="openOrder('Telecel','5GB','GH&#8373;28.00',28.00)">Order Now</button></div>
+    <div class="pc"><div class="pbdg">Popular</div><div class="pnet tel">TELECEL</div><div class="psz">10<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;51.00<span>/bundle</span></div><button class="bord" onclick="openOrder('Telecel','10GB','GH&#8373;51.00',51.00)">Order Now</button></div>
+    <div class="pc"><div class="pnet tel">TELECEL</div><div class="psz">15<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;72.00<span>/bundle</span></div><button class="bord" onclick="openOrder('Telecel','15GB','GH&#8373;72.00',72.00)">Order Now</button></div>
+    <div class="pc"><div class="pbdg">Best Value</div><div class="pnet tel">TELECEL</div><div class="psz">20<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;95.00<span>/bundle</span></div><button class="bord" onclick="openOrder('Telecel','20GB','GH&#8373;95.00',95.00)">Order Now</button></div>
+  </div>
+</section>
+
+<section id="reviews">
+  <p class="stag">TESTIMONIALS</p><h2 class="stit">What Our Customers Say</h2><p class="ssub">Real experiences from real people across Ghana.</p>
+  <div class="rgrid">
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"Zone Data Hub is the fastest data service I have used. My 5GB MTN was on my phone within 30 minutes!"</p><div class="rau"><div class="rav">KA</div><div><div class="rnm">Kwame Asante</div><div class="rlc">Accra, Ghana</div></div></div></div>
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"Cheapest data prices in Ghana! Been buying Telecel bundles here for 3 months. Never had an issue."</p><div class="rau"><div class="rav">AF</div><div><div class="rnm">Abena Frimpong</div><div class="rlc">Kumasi, Ghana</div></div></div></div>
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"The Zone AI chat support resolved my issue so fast. Very professional service!"</p><div class="rau"><div class="rav">EO</div><div><div class="rnm">Eli Owusu</div><div class="rlc">Takoradi, Ghana</div></div></div></div>
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"Great platform! The dashboard shows all my orders. So organized!"</p><div class="rau"><div class="rav">SA</div><div><div class="rnm">Sandra Acheampong</div><div class="rlc">Cape Coast, Ghana</div></div></div></div>
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"I buy data for my whole family here. Fast delivery, secure payment!"</p><div class="rau"><div class="rav">BM</div><div><div class="rnm">Benjamin Mensah</div><div class="rlc">Tamale, Ghana</div></div></div></div>
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"Zone Data Hub has the best MTN bundles! Fast delivery, great prices. Highly recommended!"</p><div class="rau"><div class="rav">JB</div><div><div class="rnm">Joyce Boateng</div><div class="rlc">Tema, Ghana</div></div></div></div>
+  </div>
+</section>
+
+<section id="support">
+  <p class="stag" style="text-align:center;">CUSTOMER CARE</p><h2 class="stit" style="text-align:center;">We Are Here For You</h2>
+  <p class="ssub" style="text-align:center;margin:0 auto 3rem;">Chat with our AI or reach us directly.</p>
+  <div class="supgrid">
+    <div class="cbox">
+      <div class="chdr"><div class="cav">&#x1F916;</div><div><div class="cnm">Zone AI Assistant</div><div class="cst">Online — Always available</div></div><div class="con"></div></div>
+      <div class="cmsgs" id="chatMsgs"><div class="msg mai">Hello! I am Zone AI. How may I help you today?</div></div>
+      <div class="ciw"><input type="text" class="ci" id="chatIn" placeholder="Type your message..."/><button class="cs" onclick="sendChat()">Send</button></div>
+    </div>
+    <div class="ccard">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:1.5rem;">Contact Us</div>
+      <div class="cit"><div class="cion">&#x1F4E7;</div><div><div class="clb">Email Support</div><div class="cvl">zonedatahub@gmail.com</div></div></div>
+      <div class="cit"><div class="cion">&#x23F0;</div><div><div class="clb">Response Time</div><div class="cvl">Within 24 hours</div></div></div>
+      <div class="cit"><div class="cion">&#x1F4E6;</div><div><div class="clb">Order Issues</div><div class="cvl">Use AI chat with your Order ID</div></div></div>
+      <div class="cit"><div class="cion">&#x1F512;</div><div><div class="clb">Secure Payments</div><div class="cvl">Powered by Paystack</div></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="flogo">&#x2B21; ZONE DATA HUB</div>
+  <p class="ftxt">&#169; 2024 Zone Data Hub. All rights reserved. Fast. Reliable. Affordable.</p>
+  <p style="margin-top:0.5rem;"><button onclick="openAdminLogin()" style="background:none;border:none;color:var(--t2);font-size:0.7rem;cursor:pointer;opacity:0.3;">Admin Access</button></p>
+</footer>
+</div>
+
+<!-- ADMIN VIEW -->
+<div id="av" style="display:none;min-height:100vh;padding:90px 5% 60px;">
+  <div style="color:var(--ac3);font-size:0.75rem;font-weight:700;letter-spacing:1px;margin-bottom:1.5rem;">&#x1F510; ADMIN PANEL</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+    <div><h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;">Admin Dashboard</h2><p style="color:var(--t2);font-size:0.875rem;">All customer orders. Mark delivered to notify via WhatsApp.</p></div>
+    <div style="display:flex;gap:0.5rem;"><button class="btn bg2b" onclick="loadAdminOrders()">&#x1F504; Refresh</button><button class="btn bw" onclick="logoutAdmin()">&#x1F6AA; Exit Admin</button></div>
+  </div>
+  <div class="ow"><div class="oh">&#x1F4CB; All Customer Orders</div>
+  <div class="ts"><table><thead><tr><th>Order ID</th><th>Customer</th><th>Package</th><th>Phone</th><th>Amount</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr></thead><tbody id="aob"><tr><td colspan="9" style="text-align:center;color:var(--t2);padding:2rem;">No orders yet.</td></tr></tbody></table></div></div>
+</div>
+
+<!-- DASHBOARD PANEL -->
+<div id="dp" class="dp"><div class="dpi">
+  <!-- Loading overlay -->
+  <div id="dao"><div class="spin"></div><div style="font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:0.5rem;" id="dam">Loading...</div><div class="dr"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div style="color:var(--t2);font-size:0.85rem;max-width:280px;line-height:1.7;">Please wait.</div></div>
+  <!-- Pre-login -->
+  <div id="dpl">
+    <div style="text-align:center;margin-bottom:1.5rem;"><div style="font-size:2.5rem;margin-bottom:0.5rem;">&#x1F464;</div><div style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:0.3rem;">My Account</div><p style="color:var(--t2);font-size:0.875rem;line-height:1.6;">Sign in or create an account to access your orders, wallet and transactions.</p></div>
+    <p class="plt si">Sign In</p>
+    <button class="goog" onclick="loginGoogle(false)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Login with Google account</button>
+    <button class="btn bg2b" style="width:100%;padding:0.75rem;" onclick="showDEF('login')">&#x1F4E7; Login with email and password</button>
+    <div class="dl"></div>
+    <p class="plt ca">Create Account</p>
+    <button class="goog" onclick="loginGoogle(true)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Create with Google account</button>
+    <button class="btn bg2b" style="width:100%;padding:0.75rem;" onclick="showDEF('register')">&#x1F4E7; Create with email and password</button>
+    <!-- Dashboard email form -->
+    <div id="def" style="display:none;margin-top:1.5rem;">
+      <div class="at" style="margin-bottom:1rem;"><button class="atb active" id="dtl" onclick="switchDET('login')">Login</button><button class="atb" id="dtr" onclick="switchDET('register')">Register</button></div>
+      <div id="dlf">
+        <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="dle" placeholder="your@email.com"/></div>
+        <div class="fg"><label class="fl">Password</label><div class="pw"><input type="password" class="fi" id="dlp" placeholder="Your password"/><button class="pe" onclick="tpe('dlp',this)">Show</button></div></div>
+        <div class="ae" id="dler"></div>
+        <button class="btn bp" style="width:100%;padding:0.85rem;margin-top:0.5rem;" id="dlb" onclick="dLogin()">Login</button>
+      </div>
+      <div id="drf" style="display:none;">
+        <div id="drs1">
+          <div class="fg"><label class="fl">Full Name</label><input type="text" class="fi" id="drn" placeholder="Your full name"/></div>
+          <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="dre" placeholder="your@email.com"/></div>
+          <div class="fg"><label class="fl">Password</label><div class="pw"><input type="password" class="fi" id="drp" placeholder="At least 6 characters"/><button class="pe" onclick="tpe('drp',this)">Show</button></div></div>
+          <div class="ae" id="drer"></div>
+          <button class="btn bp" style="width:100%;padding:0.85rem;margin-top:0.5rem;" id="dsob" onclick="dSendOTP()">Send Verification Code</button>
+        </div>
+        <div id="drs2" style="display:none;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">&#x1F4EC;</div>
+          <p style="color:var(--t2);font-size:0.85rem;margin-bottom:1rem;">Code sent to <strong id="doe"></strong>. Check inbox and spam.</p>
+          <input type="text" class="ci2" id="doi" placeholder="000000" maxlength="6"/>
+          <div class="ae" id="doer" style="margin-top:0.5rem;"></div>
+          <button class="btn bp" style="width:100%;padding:0.85rem;margin-top:1rem;" id="dvob" onclick="dVerifyOTP()">Verify and Create Account</button>
+          <br/><button class="rb" onclick="dResendOTP()">Resend Code</button>
+          <br/><button class="rb" style="color:var(--t2);" onclick="dBack()">Go Back</button>
+        </div>
+      </div>
+      <button class="rb" style="margin-top:1rem;color:var(--t2);" onclick="hideDEF()">&#x2190; Back</button>
+    </div>
+  </div>
+  <!-- Logged-in dashboard -->
+  <div id="dli" style="display:none;">
+    <div class="dph">
+      <div><div class="abg">&#x1F464; MY ACCOUNT</div><div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;" id="dg">Welcome back!</div><div style="color:var(--t2);font-size:0.85rem;margin-top:0.2rem;" id="de"></div></div>
+      <button class="ctb" onclick="closeDash()">Close tab</button>
+    </div>
+    <div class="dn">
+      <button class="dnb active" id="bo" onclick="switchD('orders')">&#x1F4E6; Orders</button>
+      <button class="dnb" id="bt" onclick="switchD('transactions')">&#x1F4B0; Transactions</button>
+      <button class="dnb" id="bs" onclick="switchD('status')">&#x1F4E1; Status</button>
+      <button class="dnb" id="bw" onclick="switchD('wallet')">&#x1F45B; Wallet</button>
+      <button class="dnb" onclick="topUp()">&#x2B06; Top Up</button>
+      <button class="dnb" onclick="refreshD()">&#x1F504; Refresh</button>
+      <button class="dnb lob" onclick="logoutUser()">&#x1F6AA; Logout</button>
+    </div>
+    <div class="dg">
+      <div class="dc"><div class="dct">Wallet Balance</div><div class="dcv" id="wb">GH&#8373;0.00</div></div>
+      <div class="dc"><div class="dct">Total Orders</div><div class="dcv" id="to">0</div></div>
+      <div class="dc"><div class="dct">Delivered</div><div class="dcv" id="do2">0</div></div>
+    </div>
+    <div class="ds active" id="so"><div class="ow"><div class="oh">&#x1F4E6; My Orders</div><div class="ts"><table><thead><tr><th>Order ID</th><th>Package</th><th>Phone</th><th>Amount</th><th>Date</th><th>Time</th><th>Status</th></tr></thead><tbody id="ob"><tr><td colspan="7" style="text-align:center;color:var(--t2);padding:2rem;">No orders yet.</td></tr></tbody></table></div></div></div>
+    <div class="ds" id="st"><div class="ow"><div class="oh">&#x1F4B0; Transaction History</div><div class="ts"><table><thead><tr><th>Type</th><th>Amount</th><th>Description</th><th>Date</th><th>Time</th></tr></thead><tbody id="tb"><tr><td colspan="5" style="text-align:center;color:var(--t2);padding:2rem;">No transactions yet.</td></tr></tbody></table></div></div></div>
+    <div class="ds" id="ss"><div class="ow"><div class="oh">&#x1F4E1; Order Status</div><div class="ts"><table><thead><tr><th>Order ID</th><th>Package</th><th>Phone</th><th>Status</th><th>Date</th></tr></thead><tbody id="sb2"><tr><td colspan="5" style="text-align:center;color:var(--t2);padding:2rem;">No orders found.</td></tr></tbody></table></div></div></div>
+    <div class="ds" id="sw"><div class="dc" style="max-width:400px;"><div class="dct">&#x1F45B; Wallet Balance</div><div class="dcv" id="wb2">GH&#8373;0.00</div><p style="color:var(--t2);font-size:0.85rem;margin-top:0.5rem;">Top up your wallet to pay for orders quickly.</p><button class="btn bp" style="margin-top:1rem;width:100%;" onclick="topUp()">&#x2B06; Top Up Now</button></div></div>
+  </div>
+</div></div>
+<div id="dbk" class="dbk"></div>
+
+<!-- ORDER MODAL -->
+<div class="mo" id="om"><div class="md">
+  <button class="mc" onclick="closeM('om')">&#x2715;</button>
+  <div class="mt">&#x1F6D2; Place Your Order</div><div class="msb">Enter the number to receive the data bundle.</div>
+  <div class="mpk"><div><div style="font-size:0.75rem;color:var(--t2);" id="on2"></div><div style="font-weight:700;" id="opk"></div></div><div class="mpp" id="opr"></div></div>
+  <div id="nh" class="nh"></div>
+  <div class="fg"><label class="fl">&#x1F4F1; Recipient Phone Number</label><input type="tel" class="fi" id="rn" placeholder="e.g. 0241234567" maxlength="10"/></div>
+  <div class="fg"><label class="fl">&#x2705; Confirm Phone Number</label><input type="tel" class="fi" id="rn2" placeholder="Re-enter phone number" maxlength="10"/></div>
+  <div style="font-size:0.8rem;color:var(--t2);margin-bottom:1rem;">&#x26A0; Please double-check. Wrong numbers are not refundable.</div>
+  <button class="btn bp mb" onclick="proceed()">&#x1F4B3; Proceed to Payment</button>
+</div></div>
+
+<!-- AUTH MODAL -->
+<div class="mo" id="am"><div class="md">
+  <button class="mc" onclick="closeM('am')">&#x2715;</button>
+  <div class="mt">Welcome to Zone Data Hub</div><div class="msb">Login or create your account</div>
+  <div class="at"><button class="atb active" id="tl" onclick="switchAT('login')">Login</button><button class="atb" id="tr2" onclick="switchAT('register')">Register</button></div>
+  <div id="lf">
+    <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="le" placeholder="your@email.com"/></div>
+    <div class="fg"><label class="fl">Password</label><div class="pw"><input type="password" class="fi" id="lp" placeholder="Your password"/><button class="pe" onclick="tpe('lp',this)">Show</button></div></div>
+    <div class="ae" id="ler"></div>
+    <button class="btn bp mb" id="lb" onclick="loginUser()">Login</button>
+    <div class="div">or</div>
+    <button class="goog" onclick="loginGoogle(false)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Continue with Google</button>
+  </div>
+  <div id="rf" style="display:none;">
+    <div id="rs1">
+      <div class="fg"><label class="fl">Full Name</label><input type="text" class="fi" id="rn3" placeholder="Your full name"/></div>
+      <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="re" placeholder="your@email.com"/></div>
+      <div class="fg"><label class="fl">Password</label><div class="pw"><input type="password" class="fi" id="rp" placeholder="At least 6 characters"/><button class="pe" onclick="tpe('rp',this)">Show</button></div></div>
+      <div class="ae" id="rer"></div>
+      <button class="btn bp mb" id="sob" onclick="sendOTP()">Send Verification Code</button>
+      <div class="div">or</div>
+      <button class="goog" onclick="loginGoogle(true)"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Sign up with Google</button>
+    </div>
+    <div id="rs2" style="display:none;text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#x1F4EC;</div>
+      <p style="color:var(--t2);font-size:0.875rem;margin-bottom:1.2rem;">Code sent to <strong id="oed"></strong>. Check inbox and spam.</p>
+      <input type="text" class="ci2" id="oi" placeholder="000000" maxlength="6"/>
+      <div class="ae" id="oer" style="margin-top:0.5rem;"></div>
+      <button class="btn bp mb" id="vob" onclick="verifyOTP()" style="margin-top:1rem;">Verify and Create Account</button>
+      <br/><button class="rb" onclick="resendOTP()">Resend Code</button>
+      <br/><button class="rb" style="color:var(--t2);" onclick="back1()">Go Back</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- LOGIN REQUIRED -->
+<div class="mo" id="lrm"><div class="md">
+  <button class="mc" onclick="closeM('lrm')">&#x2715;</button>
+  <div style="text-align:center;font-size:2.5rem;margin-bottom:1rem;">&#x1F510;</div>
+  <div class="mt" style="text-align:center;">Login Required</div>
+  <p class="msb" style="text-align:center;">You need an account to complete this purchase.</p>
+  <button class="btn bp mb" onclick="closeM('lrm');openAuth('login');">Login to Continue</button>
+  <button class="btn bg2b mb" style="margin-top:0.5rem;" onclick="closeM('lrm');openAuth('register');">Create an Account</button>
+</div></div>
+
+<!-- ADMIN MODAL -->
+<div class="mo" id="adm"><div class="md">
+  <button class="mc" onclick="closeM('adm')">&#x2715;</button>
+  <div class="mt" style="color:var(--ac3);">&#x1F510; Admin Access</div>
+  <div class="msb">Enter your secret admin key to continue.</div>
+  <div class="fg"><label class="fl">Admin Secret Key</label><input type="password" class="fi" id="ak" placeholder="Enter admin key"/></div>
+  <div class="ae" id="aer" style="margin-bottom:0.5rem;"></div>
+  <button class="btn mb" style="background:linear-gradient(135deg,var(--ac3),#ef4444);color:#000;width:100%;padding:0.9rem;" onclick="verifyAdmin()">Access Admin Panel</button>
+</div></div>
+
+<div class="toast" id="toast"><div class="tt2" id="tt"></div><div class="tm" id="tm"></div></div>
+
+<script>
+// ============================================================
+// FIREBASE — correct CDN URLs (wrong URLs caused blank page)
+// ============================================================
+firebase.initializeApp({
+  apiKey:"AIzaSyAvL4ikdDGdY-FO9HTnLXHd5s81l840zec",
+  authDomain:"zone-data-hub.firebaseapp.com",
+  projectId:"zone-data-hub",
+  storageBucket:"zone-data-hub.firebasestorage.app",
+  messagingSenderId:"415813127941",
+  appId:"1:415813127941:web:1d6f1b8cab1f3fef1d716c"
+});
+var auth=firebase.auth(), db=firebase.firestore();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+emailjs.init("c3_7QJNC0ofIS5IN6");
+var ES="service_8f7s0z8",ET="template_kxmuqqs",AS="ZONEHUB@ADMIN0504839130#SECURE",PK="pk_live_f0cc6353f3afaa28cc373e1506c089546dd55363",WA="233531861148";
+var CU=null,isAdm=false,CO={},PO=null,OS={},WU=null,PJL=true;
+setTimeout(function(){PJL=false;},3000);
+
+// AUTH STATE
+auth.onAuthStateChanged(function(u){
+  if(isAdm) return;
+  if(!u){CU=null;if(WU){WU();WU=null;}g("abtns").style.display="flex";g("mab").style.display="none";return;}
+  if(CU&&CU.uid===u.uid) return;
+  setTimeout(function(){
+    db.collection("users").doc(u.uid).get().then(function(d){
+      if(!d.exists) return db.collection("users").doc(u.uid).set({name:u.displayName||u.email.split("@")[0],email:u.email,uid:u.uid,walletBalance:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    }).then(function(){
+      CU=u;
+      g("abtns").style.display="none";g("mab").style.display="inline-flex";
+      g("dg").textContent="Welcome back, "+(u.displayName||u.email.split("@")[0])+"!";
+      g("de").textContent=u.email;
+      g("dao").style.display="none";
+      var po=g("dp").classList.contains("open");
+      if(po){g("dpl").style.display="none";g("dli").style.display="block";loadO(u.uid);loadT(u.uid);showT("Signed In!","Welcome, "+(u.displayName||u.email.split("@")[0])+"!");}
+      else if(PJL){showT("Welcome back!","Logged in as "+(u.displayName||u.email));}
+      else if(PO){CO=PO;PO=null;launchPS();}
+      else{openDashLI();}
+      startWL(u.uid);rbtns();
+    }).catch(function(e){
+      console.warn(e);CU=u;g("abtns").style.display="none";g("mab").style.display="inline-flex";g("dao").style.display="none";startWL(u.uid);rbtns();if(!PJL) openDashLI();
+    });
+  },500);
+});
+
+function g(id){return document.getElementById(id);}
+function rbtns(){["lb","sob","vob","dlb","dsob","dvob"].forEach(function(id){var b=g(id);if(!b)return;b.disabled=false;if(id==="lb"||id==="dlb")b.textContent="Login";else if(id==="sob"||id==="dsob")b.textContent="Send Verification Code";else b.textContent="Verify and Create Account";});}
+
+// DASHBOARD PANEL
+function openDash(){g("dp").classList.add("open");g("dbk").classList.add("open");if(CU){g("dpl").style.display="none";g("dli").style.display="block";g("dao").style.display="none";loadO(CU.uid);loadT(CU.uid);}else{g("dpl").style.display="block";g("dli").style.display="none";g("dao").style.display="none";}}
+function openDashLI(){g("dp").classList.add("open");g("dbk").classList.add("open");g("dpl").style.display="none";g("dli").style.display="block";g("dao").style.display="none";if(CU){loadO(CU.uid);loadT(CU.uid);}}
+function closeDash(){g("dp").classList.remove("open");g("dbk").classList.remove("open");}
+function showLoad(m){g("dam").textContent=m||"Wait for a minute, your login or signup is being run in the system background.";g("dao").style.display="flex";g("dpl").style.display="none";g("dli").style.display="none";}
+
+// GOOGLE
+function loginGoogle(isSU){
+  var po=g("dp").classList.contains("open");
+  if(po) showLoad("Wait for a minute, your login or signup is being run in the system background.");
+  var p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
+  auth.signInWithPopup(p).then(function(){closeM("am");}).catch(function(e){
+    if(po){g("dao").style.display="none";g("dpl").style.display="block";}
+    if(e.code==="auth/popup-closed-by-user"||e.code==="auth/cancelled-popup-request") return;
+    showT("Sign-In Failed",e.code==="auth/popup-blocked"?"Popup blocked. Please allow popups.":"Google sign-in failed. Try again.");
+  });
+}
+
+// EMAIL LOGIN
+function loginUser(){
+  var em=g("le").value.trim(),pw=g("lp").value,er=g("ler");er.style.display="none";
+  if(!em||!pw){er.textContent="Please enter your email and password.";er.style.display="block";return;}
+  var po=g("dp").classList.contains("open");if(po) showLoad("Wait for a minute, your login or signup is being run in the system background.");
+  var b=g("lb");b.disabled=true;b.textContent="Logging in...";
+  auth.signInWithEmailAndPassword(em,pw).then(function(){closeM("am");}).catch(function(e){
+    if(po){g("dao").style.display="none";g("dpl").style.display="block";}
+    b.disabled=false;b.textContent="Login";
+    er.textContent=e.code==="auth/too-many-requests"?"Too many attempts. Please wait.":"Incorrect email or password.";er.style.display="block";
+  });
+}
+function dLogin(){
+  var em=g("dle").value.trim(),pw=g("dlp").value,er=g("dler");er.style.display="none";
+  if(!em||!pw){er.textContent="Please enter your email and password.";er.style.display="block";return;}
+  showLoad("Wait for a minute, your login or signup is being run in the system background.");
+  var b=g("dlb");b.disabled=true;b.textContent="Logging in...";
+  auth.signInWithEmailAndPassword(em,pw).catch(function(e){
+    g("dao").style.display="none";g("dpl").style.display="block";b.disabled=false;b.textContent="Login";
+    er.textContent=e.code==="auth/too-many-requests"?"Too many attempts.":"Incorrect email or password.";er.style.display="block";
+  });
+}
+
+// OTP SIGNUP
+function genOTP(){return String(((Date.now()%10000*7+Math.floor(Math.random()*9000)+1000)%900000)+100000);}
+function sendOTP(){
+  var nm=g("rn3").value.trim(),em=g("re").value.trim(),pw=g("rp").value,er=g("rer");er.style.display="none";
+  if(!nm||!em||!pw){er.textContent="Please fill in all fields.";er.style.display="block";return;}
+  if(pw.length<6){er.textContent="Password must be at least 6 characters.";er.style.display="block";return;}
+  var b=g("sob");b.disabled=true;b.textContent="Sending...";
+  var code=genOTP();OS[em]={code:code,exp:Date.now()+15*60*1000,name:nm,pass:pw};
+  emailjs.send(ES,ET,{to_email:em,user_name:nm,verification_code:code}).then(function(){
+    b.disabled=false;b.textContent="Send Verification Code";
+    g("rs1").style.display="none";g("rs2").style.display="block";g("oed").textContent=em;g("oi").value="";
+  }).catch(function(){b.disabled=false;b.textContent="Send Verification Code";er.textContent="Failed to send code. Try again.";er.style.display="block";});
+}
+function verifyOTP(){
+  var em=g("re").value.trim(),en=g("oi").value.trim(),er=g("oer");er.style.display="none";
+  if(!en||en.length!==6){er.textContent="Please enter the 6-digit code.";er.style.display="block";return;}
+  var s=OS[em];
+  if(!s){er.textContent="No code found. Please resend.";er.style.display="block";return;}
+  if(Date.now()>s.exp){er.textContent="Code expired. Please resend.";er.style.display="block";return;}
+  if(en!==s.code){er.textContent="Incorrect code. Try again.";er.style.display="block";return;}
+  var b=g("vob");b.disabled=true;b.textContent="Creating account...";
+  var po=g("dp").classList.contains("open");if(po) showLoad("Wait for a minute, your login or signup is being run in the system background.");
+  var nm=s.name,pw=s.pass;delete OS[em];
+  auth.createUserWithEmailAndPassword(em,pw).then(function(c){
+    return c.user.updateProfile({displayName:nm}).then(function(){return db.collection("users").doc(c.user.uid).set({name:nm,email:em,uid:c.user.uid,walletBalance:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});});
+  }).then(function(){closeM("am");}).catch(function(e){
+    if(po){g("dao").style.display="none";g("dpl").style.display="block";}
+    b.disabled=false;b.textContent="Verify and Create Account";
+    er.textContent=e.code==="auth/email-already-in-use"?"Email already has an account. Please login.":e.message;er.style.display="block";
+  });
+}
+function resendOTP(){var em=g("re").value.trim(),s=OS[em];if(!s){g("oer").textContent="Please go back.";g("oer").style.display="block";return;}var c=genOTP();s.code=c;s.exp=Date.now()+15*60*1000;emailjs.send(ES,ET,{to_email:em,user_name:s.name,verification_code:c}).then(function(){g("oer").textContent="New code sent!";g("oer").style.color="#10b981";g("oer").style.display="block";}).catch(function(){g("oer").textContent="Failed to resend.";g("oer").style.display="block";});}
+function back1(){g("rs1").style.display="block";g("rs2").style.display="none";}
+
+// Dashboard OTP
+function dSendOTP(){
+  var nm=g("drn").value.trim(),em=g("dre").value.trim(),pw=g("drp").value,er=g("drer");er.style.display="none";
+  if(!nm||!em||!pw){er.textContent="Please fill in all fields.";er.style.display="block";return;}
+  if(pw.length<6){er.textContent="Password must be at least 6 characters.";er.style.display="block";return;}
+  var b=g("dsob");b.disabled=true;b.textContent="Sending...";
+  showLoad("Wait for a minute, your login or signup is being run in the system background.");
+  var code=genOTP();OS[em]={code:code,exp:Date.now()+15*60*1000,name:nm,pass:pw};
+  emailjs.send(ES,ET,{to_email:em,user_name:nm,verification_code:code}).then(function(){
+    b.disabled=false;b.textContent="Send Verification Code";g("dao").style.display="none";g("dpl").style.display="block";g("def").style.display="block";switchDET("register");g("drs1").style.display="none";g("drs2").style.display="block";g("doe").textContent=em;g("doi").value="";
+  }).catch(function(){b.disabled=false;b.textContent="Send Verification Code";g("dao").style.display="none";g("dpl").style.display="block";er.textContent="Failed to send code. Try again.";er.style.display="block";});
+}
+function dVerifyOTP(){
+  var em=g("dre").value.trim(),en=g("doi").value.trim(),er=g("doer");er.style.display="none";
+  if(!en||en.length!==6){er.textContent="Please enter the 6-digit code.";er.style.display="block";return;}
+  var s=OS[em];if(!s){er.textContent="No code found. Please resend.";er.style.display="block";return;}
+  if(Date.now()>s.exp){er.textContent="Code expired.";er.style.display="block";return;}
+  if(en!==s.code){er.textContent="Incorrect code.";er.style.display="block";return;}
+  var b=g("dvob");b.disabled=true;b.textContent="Creating...";
+  showLoad("Wait for a minute, your login or signup is being run in the system background.");
+  var nm=s.name,pw=s.pass;delete OS[em];
+  auth.createUserWithEmailAndPassword(em,pw).then(function(c){return c.user.updateProfile({displayName:nm}).then(function(){return db.collection("users").doc(c.user.uid).set({name:nm,email:em,uid:c.user.uid,walletBalance:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});});})
+  .catch(function(e){b.disabled=false;b.textContent="Verify and Create Account";g("dao").style.display="none";g("dpl").style.display="block";er.textContent=e.code==="auth/email-already-in-use"?"Email already has an account. Please login.":e.message;er.style.display="block";});
+}
+function dResendOTP(){var em=g("dre").value.trim(),s=OS[em];if(!s){g("doer").textContent="Please go back.";g("doer").style.display="block";return;}var c=genOTP();s.code=c;s.exp=Date.now()+15*60*1000;emailjs.send(ES,ET,{to_email:em,user_name:s.name,verification_code:c}).then(function(){g("doer").textContent="New code sent!";g("doer").style.color="#10b981";g("doer").style.display="block";}).catch(function(){g("doer").textContent="Failed to resend.";g("doer").style.display="block";});}
+function dBack(){g("drs1").style.display="block";g("drs2").style.display="none";}
+
+// LOGOUT
+function logoutUser(){if(WU){WU();WU=null;}auth.signOut().then(function(){CU=null;closeDash();g("abtns").style.display="flex";g("mab").style.display="none";g("dpl").style.display="block";g("dli").style.display="none";g("def").style.display="none";showT("Logged Out","See you soon!");});}
+
+// WALLET
+function startWL(uid){if(WU){WU();WU=null;}WU=db.collection("users").doc(uid).onSnapshot(function(d){var b=d.exists?(d.data().walletBalance||0):0;var s="GH\u20B3 "+parseFloat(b).toFixed(2);g("wb").textContent=s;g("wb2").textContent=s;});}
+
+// TOP-UP
+function topUp(){
+  if(!CU){openDash();return;}
+  var a=parseFloat(prompt("Enter deposit amount in GH\u20B3 (minimum GH\u20B3 1):"));
+  if(!a||isNaN(a)||a<1){showT("Invalid Amount","Please enter at least GH\u20B3 1.");return;}
+  PaystackPop.setup({key:PK,email:CU.email,amount:Math.round(a*100),currency:"GHS",ref:"TOPUP-"+Date.now()+"-"+Math.floor(Math.random()*9999),
+    onClose:function(){showT("Cancelled","Top-up was cancelled.");},
+    callback:function(r){
+      var ur=db.collection("users").doc(CU.uid);
+      db.runTransaction(function(t){return t.get(ur).then(function(d){var c=d.exists?(d.data().walletBalance||0):0;var nb=parseFloat((c+a).toFixed(2));t.update(ur,{walletBalance:nb});return nb;});})
+      .then(function(nb){var n=new Date();return db.collection("users").doc(CU.uid).collection("transactions").add({type:"Deposit",amount:a,newBalance:nb,description:"Wallet deposit via Paystack",ref:r.reference,date:n.toLocaleDateString("en-GH",{day:"2-digit",month:"short",year:"numeric"}),time:n.toLocaleTimeString("en-GH",{hour:"2-digit",minute:"2-digit"}),createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){return nb;});})
+      .then(function(){showT("Deposit Successful!","GH\u20B3 "+a.toFixed(2)+" added to your wallet.");loadT(CU.uid);})
+      .catch(function(e){console.error(e);showT("Error","Payment received but balance update failed. Please refresh.");});
+    }
+  }).openIframe();
+}
+
+// ORDERS
+function loadO(uid){
+  db.collection("users").doc(uid).collection("orders").orderBy("createdAt","desc").get().then(function(snap){
+    var os=[];snap.forEach(function(d){os.push(d.data());});
+    g("to").textContent=os.length;g("do2").textContent=os.filter(function(o){return o.status==="Delivered";}).length;
+    g("ob").innerHTML=os.length?os.map(function(o){return "<tr><td style='font-size:0.75rem'>"+o.orderId+"</td><td>"+o.network+" "+o.package+"</td><td>"+o.recipientPhone+"</td><td>"+o.price+"</td><td>"+o.date+"</td><td>"+o.time+"</td><td><span class='sb "+(o.status==="Delivered"?"sd":o.status==="Processing"?"spr":"sp")+"'>"+o.status+"</span></td></tr>";}).join(""):"<tr><td colspan='7' style='text-align:center;color:var(--t2);padding:2rem;'>No orders yet.</td></tr>";
+    g("sb2").innerHTML=os.length?os.map(function(o){return "<tr><td style='font-size:0.75rem'>"+o.orderId+"</td><td>"+o.network+" "+o.package+"</td><td>"+o.recipientPhone+"</td><td><span class='sb "+(o.status==="Delivered"?"sd":o.status==="Processing"?"spr":"sp")+"'>"+o.status+"</span></td><td>"+o.date+"</td></tr>";}).join(""):"<tr><td colspan='5' style='text-align:center;color:var(--t2);padding:2rem;'>No orders found.</td></tr>";
+  });
+}
+
+// TRANSACTIONS
+function loadT(uid){
+  var tb=g("tb");tb.innerHTML="<tr><td colspan='5' style='text-align:center;color:var(--t2);padding:1rem;'>Loading...</td></tr>";
+  db.collection("users").doc(uid).collection("transactions").orderBy("createdAt","desc").get().then(function(snap){
+    var txs=[];snap.forEach(function(d){txs.push(d.data());});
+    tb.innerHTML=txs.length?txs.map(function(t){var isIn=(t.type==="Deposit"||t.amount>0);var cl=isIn?"#10b981":"#ef4444";var am=(isIn?"+":"-")+"GH\u20B3 "+Math.abs(t.amount).toFixed(2);return "<tr><td><span class='sb "+(isIn?"sd":"spr")+"'>"+t.type+"</span></td><td style='font-weight:700;color:"+cl+"'>"+am+"</td><td>"+(t.description||"Transaction")+"</td><td>"+(t.date||"")+"</td><td>"+(t.time||"")+"</td></tr>";}).join(""):"<tr><td colspan='5' style='text-align:center;color:var(--t2);padding:2rem;'>No transactions yet.</td></tr>";
+  }).catch(function(){tb.innerHTML="<tr><td colspan='5' style='text-align:center;color:#ef4444;padding:1rem;'>Could not load. Please refresh.</td></tr>";});
+}
+
+// SAVE ORDER
+function saveOrder(ref,em){
+  var n=new Date(),id="ORD-"+Date.now();
+  var d={orderId:id,reference:ref,network:CO.network,package:CO.pkg,price:CO.price,amount:CO.amount,recipientPhone:CO.phone,customerEmail:em,customerName:CU?(CU.displayName||em.split("@")[0]):"Guest",customerUid:CU?CU.uid:"guest",date:n.toLocaleDateString("en-GH",{day:"2-digit",month:"short",year:"numeric"}),time:n.toLocaleTimeString("en-GH",{hour:"2-digit",minute:"2-digit"}),status:"Pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+  db.collection("orders").doc(id).set(d).then(function(){
+    if(CU) db.collection("users").doc(CU.uid).collection("orders").doc(id).set(d);
+    setTimeout(function(){db.collection("orders").doc(id).update({status:"Processing"});if(CU) db.collection("users").doc(CU.uid).collection("orders").doc(id).update({status:"Processing"});},3*60*1000);
+    showT("Order Placed!",CO.network+" "+CO.pkg+" for "+CO.phone+". ID: "+id);
+    window.open("https://wa.me/"+WA+"?text="+encodeURIComponent("NEW ORDER - ZONE DATA HUB\n\nOrder ID: "+id+"\nNetwork: "+CO.network+"\nPackage: "+CO.pkg+"\nAmount: "+CO.price+"\nPhone: "+CO.phone+"\nCustomer: "+em+"\nDate: "+d.date+"\nTime: "+d.time+"\nStatus: Pending"),"_blank");
+    if(CU) loadO(CU.uid);
+  }).catch(function(e){console.error(e);showT("Error","Could not save order. Contact support.");});
+}
+function launchPS(){if(!CU)return;PaystackPop.setup({key:PK,email:CU.email,amount:Math.round(CO.amount*100),currency:"GHS",ref:"ZDH-"+Date.now(),onClose:function(){showT("Cancelled","Payment was cancelled.");},callback:function(r){saveOrder(r.reference,CU.email);}}).openIframe();}
+
+// ORDER FLOW
+function valPhone(num,net){var n=num.replace(/\s/g,"").replace(/-/g,"");if(n.length!==10||n[0]!=="0") return{v:false,m:"Number must be 10 digits starting with 0."};var p=n.substring(0,3);if(net==="MTN"&&["024","025","053","054","055","059"].indexOf(p)===-1) return{v:false,m:"MTN numbers must start with 024, 025, 053, 054, 055, or 059."};if(net==="Telecel"&&["020","050"].indexOf(p)===-1) return{v:false,m:"Telecel numbers must start with 020 or 050."};return{v:true};}
+function openOrder(net,pkg,pr,am){CO={network:net,pkg:pkg,price:pr,amount:am};g("on2").textContent=net;g("opk").textContent=pkg;g("opr").textContent=pr;g("rn").value="";g("rn2").value="";g("nh").textContent=net==="MTN"?"MTN: Numbers starting with 024, 025, 053, 054, 055, or 059":"Telecel: Numbers starting with 020 or 050";openM("om");}
+function proceed(){
+  var n1=g("rn").value.trim(),n2=g("rn2").value.trim();
+  if(!n1||n1.length<10){showT("Error","Please enter a valid 10-digit Ghana phone number.");return;}
+  if(n1!==n2){showT("Mismatch","Phone numbers do not match.");return;}
+  var c=valPhone(n1,CO.network);if(!c.v){showT("Invalid Number",c.m);return;}
+  closeM("om");CO.phone=n1;
+  if(!CU){PO=Object.assign({},CO);openM("lrm");return;}
+  launchPS();
+}
+
+// ADMIN
+function openAdminLogin(){openM("adm");}
+function verifyAdmin(){var k=g("ak").value,er=g("aer");if(k===AS){closeM("adm");isAdm=true;g("pv").style.display="none";g("av").style.display="block";loadAdminOrders();}else{er.textContent="Incorrect admin key.";er.style.display="block";}}
+function logoutAdmin(){isAdm=false;g("av").style.display="none";g("pv").style.display="block";}
+function loadAdminOrders(){
+  db.collection("orders").orderBy("createdAt","desc").get().then(function(snap){
+    var os=[];snap.forEach(function(d){os.push(Object.assign({id:d.id},d.data()));});
+    g("aob").innerHTML=os.length?os.map(function(o){var btn=o.status==="Delivered"?"<span style='color:#10b981;font-weight:700;'>Done</span>":"<button class='tkb' onclick=\"markDel('"+o.orderId+"','"+(o.customerUid||"")+"','"+o.recipientPhone+"','"+o.package+"','"+o.network+"')\">Mark Delivered</button>";return "<tr><td style='font-size:0.72rem'>"+o.orderId+"</td><td>"+(o.customerEmail||"Guest")+"</td><td>"+o.network+" "+o.package+"</td><td>"+o.recipientPhone+"</td><td>"+o.price+"</td><td>"+o.date+"</td><td>"+o.time+"</td><td><span class='sb "+(o.status==="Delivered"?"sd":o.status==="Processing"?"spr":"sp")+"'>"+o.status+"</span></td><td>"+btn+"</td></tr>";}).join(""):"<tr><td colspan='9' style='text-align:center;color:var(--t2);padding:2rem;'>No orders yet.</td></tr>";
+  });
+}
+function markDel(id,uid,ph,pkg,net){
+  db.collection("orders").doc(id).update({status:"Delivered"}).then(function(){
+    if(uid&&uid!=="guest") db.collection("users").doc(uid).collection("orders").doc(id).update({status:"Delivered"});
+    showT("Delivered!","Order "+id+" marked as delivered.");
+    window.open("https://wa.me/233"+ph.substring(1)+"?text="+encodeURIComponent("ZONE DATA HUB\n\nYour "+net+" "+pkg+" data bundle has been credited to your account ("+ph+").\n\nThank you for choosing Zone Data Hub!"),"_blank");
+    loadAdminOrders();
+  });
+}
+
+// DASH TABS
+function switchD(s){document.querySelectorAll(".ds").forEach(function(x){x.classList.remove("active");});document.querySelectorAll(".dnb").forEach(function(x){x.classList.remove("active");});g("s"+s.charAt(0)).classList.add("active");var b=g("b"+s.charAt(0));if(b) b.classList.add("active");if(s==="transactions"&&CU) loadT(CU.uid);}
+function refreshD(){if(!CU)return;loadO(CU.uid);loadT(CU.uid);showT("Refreshed","Dashboard updated!");}
+
+// AUTH MODAL
+function openAuth(tab){g("ler").style.display="none";g("rer").style.display="none";switchAT(tab);openM("am");}
+function switchAT(t){g("lf").style.display=t==="login"?"block":"none";g("rf").style.display=t==="register"?"block":"none";g("tl").classList.toggle("active",t==="login");g("tr2").classList.toggle("active",t==="register");}
+function showDEF(m){g("def").style.display="block";switchDET(m);}
+function hideDEF(){g("def").style.display="none";}
+function switchDET(t){g("dlf").style.display=t==="login"?"block":"none";g("drf").style.display=t==="register"?"block":"none";g("dtl").classList.toggle("active",t==="login");g("dtr").classList.toggle("active",t==="register");}
+
+// PASS TOGGLE
+function tpe(id,btn){var i=g(id);if(i.type==="password"){i.type="text";btn.textContent="Hide";}else{i.type="password";btn.textContent="Show";}}
+
+// THEME
+function toggleTheme(){var h=document.documentElement,d=h.getAttribute("data-theme")==="dark";h.setAttribute("data-theme",d?"light":"dark");g("thl").textContent=d?"Light":"Dark";}
+
+// NAV
+function toggleNav(){g("navLinks").classList.toggle("open");}
+function showPublic(){g("av").style.display="none";g("pv").style.display="block";}
+function scrollToPlans(){showPublic();setTimeout(function(){g("plans").scrollIntoView({behavior:"smooth"});},100);}
+function switchTab(n){g("tmtn").classList.toggle("active",n==="mtn");g("ttel").classList.toggle("active",n==="telecel");g("mp").classList.toggle("hidden",n!=="mtn");g("tp").classList.toggle("hidden",n!=="telecel");}
+
+// CHAT
+function sendChat(){var i=g("chatIn"),m=i.value.trim();if(!m)return;var ms=g("chatMsgs");ms.innerHTML+="<div class='msg mu'>"+m+"</div>";i.value="";ms.scrollTop=ms.scrollHeight;setTimeout(function(){var lm=m.toLowerCase(),r="I understand your concern. Please drop your Order ID and our team will get back to you once resolved. Thank you.";if(lm.indexOf("hello")!==-1||lm.indexOf("hi")!==-1) r="Hello! How may I help you today?";else if(lm.indexOf("deliver")!==-1||lm.indexOf("bundle")!==-1||lm.indexOf("data")!==-1) r="Sorry to hear that! Please drop your Order ID, order date, and package details. Our team will resolve it immediately.";else if(lm.indexOf("payment")!==-1||lm.indexOf("paid")!==-1) r="For payment issues, share your Order ID and transaction reference. Our team will investigate promptly.";else if(lm.indexOf("balance")!==-1||lm.indexOf("check")!==-1) r="To check your balance, dial *170# for MTN or *100# for Telecel.";ms.innerHTML+="<div class='msg mai'>"+r+"</div>";ms.scrollTop=ms.scrollHeight;},800);}
+
+// MODALS
+function openM(id){g(id).classList.add("open");}
+function closeM(id){g(id).classList.remove("open");}
+document.querySelectorAll(".mo").forEach(function(m){m.addEventListener("click",function(e){if(e.target===m) m.classList.remove("open");});});
+g("chatIn").addEventListener("keydown",function(e){if(e.key==="Enter")sendChat();});
+g("ak").addEventListener("keydown",function(e){if(e.key==="Enter")verifyAdmin();});
+
+// TOAST
+function showT(t,m,dur){dur=dur||4000;g("tt").textContent=t;g("tm").textContent=m;var el=g("toast");el.classList.add("show");setTimeout(function(){el.classList.remove("show");},dur);}
+</script>
+</body>
+</html>
