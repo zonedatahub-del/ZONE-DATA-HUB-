@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ZONE DATA HUB</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+:root{--bg:#06080f;--bg2:#0d1120;--bg3:#111827;--card:rgba(255,255,255,0.04);--cb:rgba(255,255,255,0.08);--text:#f0f4ff;--t2:#8b98b8;--ac:#00d4ff;--ac2:#7c3aed;--ac3:#f59e0b;--mtn:#ffcc00;--tel:#e11d48;--r:16px;--tr:0.3s cubic-bezier(0.4,0,0.2,1);}
+[data-theme="light"]{--bg:#f0f4ff;--bg2:#e8edf8;--bg3:#dde3f0;--card:rgba(255,255,255,0.7);--cb:rgba(0,0,0,0.1);--text:#0f172a;--t2:#475569;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+.bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(0,212,255,0.08),transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(124,58,237,0.08),transparent 60%);}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:60px 60px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 5%;height:70px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,8,15,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--cb);}
+[data-theme="light"] nav{background:rgba(240,244,255,0.9);}
+.logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.2rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;cursor:pointer;border:none;background-color:transparent;}
+.nav-links{display:flex;gap:1.8rem;list-style:none;align-items:center;}
+.nav-links a{color:var(--t2);text-decoration:none;font-size:0.9rem;font-weight:500;transition:color var(--tr);}
+.nav-links a:hover{color:var(--ac);}
+.nav-right{display:flex;align-items:center;gap:0.75rem;}
+.tw{display:flex;align-items:center;gap:0.4rem;}
+.tl{font-size:0.75rem;color:var(--t2);}
+.tt{width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;background:var(--cb);position:relative;outline:none;flex-shrink:0;}
+.tt::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--ac);transition:transform var(--tr);}
+[data-theme="light"] .tt::after{transform:translateX(20px);background:var(--ac2);}
+#abtns{display:flex;gap:0.5rem;align-items:center;}
+.btn{padding:0.55rem 1.3rem;border-radius:9px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;transition:all var(--tr);}
+.bp{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;}
+.bp:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,212,255,0.3);}
+.bg2b{background:transparent;border:1px solid var(--cb);color:var(--text);}
+.bg2b:hover{border-color:var(--ac);color:var(--ac);}
+.bw{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;}
+.goog{width:100%;padding:0.75rem;border-radius:10px;border:1px solid var(--cb);background:var(--card);color:var(--text);cursor:pointer;font-weight:600;font-size:0.9rem;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:0.6rem;transition:border-color var(--tr);}
+.goog:hover{border-color:var(--ac);}
+.bord{width:100%;padding:0.6rem;border-radius:8px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-weight:700;font-size:0.85rem;font-family:'DM Sans',sans-serif;transition:transform var(--tr);}
+.bord:hover{transform:scale(1.02);}
+.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
+.ham span{width:22px;height:2px;background:var(--text);border-radius:2px;}
+section{position:relative;z-index:1;}
+#hero{min-height:100vh;display:flex;align-items:center;padding:100px 5% 60px;}
+.hi{max-width:700px;}
+.hbadge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.35rem 1rem;border-radius:20px;margin-bottom:1.5rem;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);font-size:0.8rem;color:var(--ac);font-weight:600;}
+.pdot{width:6px;height:6px;border-radius:50%;background:var(--ac);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.5);}}
+.ht{font-family:'Syne',sans-serif;font-size:clamp(2.4rem,6vw,4.8rem);font-weight:900;line-height:1.05;margin-bottom:1.5rem;}
+.hl{background:linear-gradient(135deg,var(--ac),var(--ac2),var(--ac3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hs{font-size:1.05rem;color:var(--t2);max-width:500px;line-height:1.7;margin-bottom:2.5rem;}
+.hc{display:flex;gap:1rem;flex-wrap:wrap;}
+.hc .btn{padding:0.85rem 2.2rem;font-size:1rem;}
+.hst{display:flex;gap:2.5rem;margin-top:3rem;flex-wrap:wrap;}
+.sv{border-left:2px solid var(--ac);padding-left:1rem;}
+.sn{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:700;color:var(--ac);}
+.sl{font-size:0.78rem;color:var(--t2);margin-top:0.2rem;}
+#how{padding:80px 5%;text-align:center;}
+.stag{font-family:'Orbitron',sans-serif;font-size:0.75rem;letter-spacing:3px;color:var(--ac);margin-bottom:1rem;}
+.stit{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:800;margin-bottom:1rem;}
+.ssub{color:var(--t2);max-width:500px;margin:0 auto 3rem;line-height:1.7;}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;max-width:1000px;margin:0 auto;}
+.sc{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:2rem 1.5rem;text-align:left;position:relative;overflow:hidden;transition:transform var(--tr),border-color var(--tr);}
+.sc:hover{transform:translateY(-4px);border-color:var(--ac);}
+.scn{font-family:'Orbitron',sans-serif;font-size:2.5rem;font-weight:900;color:var(--ac);opacity:0.12;position:absolute;top:1rem;right:1rem;}
+.sic{font-size:2rem;margin-bottom:1rem;}
+.stl{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.5rem;}
+.sds{color:var(--t2);font-size:0.875rem;line-height:1.6;}
+#plans{padding:80px 5%;}
+.ptabs{display:flex;gap:0.5rem;justify-content:center;margin-bottom:2.5rem;}
+.tbtn{padding:0.6rem 2rem;border-radius:8px;border:1px solid var(--cb);background:transparent;color:var(--t2);cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;font-size:0.9rem;transition:all var(--tr);}
+.tbtn.active{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-color:transparent;}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:1.2rem;max-width:1100px;margin:0 auto;}
+.pc{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:1.5rem;text-align:center;transition:all var(--tr);position:relative;}
+.pc:hover{transform:translateY(-5px);box-shadow:0 0 40px rgba(0,212,255,0.15);border-color:var(--ac);}
+.pbdg{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--ac3);color:#000;font-size:0.65rem;font-weight:700;padding:0.2rem 0.8rem;border-radius:10px;white-space:nowrap;}
+.pnet{font-size:0.75rem;font-weight:700;letter-spacing:2px;margin-bottom:0.5rem;}
+.pnet.mtn{color:var(--mtn);}.pnet.tel{color:var(--tel);}
+.psz{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:700;line-height:1;}
+.ppr{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--ac);margin:0.5rem 0 1rem;}
+.ppr span{font-size:0.8rem;color:var(--t2);font-weight:400;}
+#reviews{padding:80px 5%;text-align:center;}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:1100px;margin:0 auto;}
+.rc{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:2rem;text-align:left;transition:transform var(--tr),border-color var(--tr);}
+.rc:hover{transform:translateY(-4px);border-color:var(--ac2);}
+.rst{color:var(--ac3);font-size:1rem;margin-bottom:1rem;}
+.rtx{color:var(--t2);font-size:0.9rem;line-height:1.7;margin-bottom:1.5rem;font-style:italic;}
+.rau{display:flex;align-items:center;gap:0.75rem;}
+.rav{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;}
+.rnm{font-weight:700;font-size:0.9rem;}.rlc{font-size:0.75rem;color:var(--t2);}
+#support{padding:80px 5%;}
+.supgrid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:1100px;margin:0 auto;align-items:start;}
+.cbox{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);overflow:hidden;}
+.chdr{padding:1.2rem 1.5rem;background:linear-gradient(135deg,var(--ac2),var(--ac));display:flex;align-items:center;gap:0.75rem;}
+.cav{width:36px;height:36px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.cnm{font-weight:700;color:#fff;font-size:0.95rem;}.cst{font-size:0.75rem;color:rgba(255,255,255,0.7);}
+.con{width:8px;height:8px;border-radius:50%;background:#4ade80;margin-left:auto;}
+.cmsgs{height:300px;overflow-y:auto;padding:1.2rem;display:flex;flex-direction:column;gap:0.75rem;}
+.cmsg{max-width:85%;padding:0.7rem 1rem;border-radius:14px;font-size:0.875rem;line-height:1.5;}
+.mai{background:var(--bg3);border-bottom-left-radius:4px;align-self:flex-start;}
+.mu{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+.ciw{padding:1rem;border-top:1px solid var(--cb);display:flex;gap:0.5rem;}
+.cinp{flex:1;background:var(--bg3);border:1px solid var(--cb);border-radius:10px;padding:0.65rem 1rem;color:var(--text);font-size:0.875rem;outline:none;font-family:'DM Sans',sans-serif;}
+.csnd{padding:0.65rem 1rem;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-weight:700;}
+.ccard{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:2rem;}
+.cit{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--cb);}
+.cit:last-child{border-bottom:none;}
+.cion{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.clb{font-size:0.8rem;color:var(--t2);margin-bottom:0.2rem;}.cvl{font-weight:600;font-size:0.95rem;}
+footer{position:relative;z-index:1;padding:3rem 5% 2rem;border-top:1px solid var(--cb);text-align:center;}
+.flogo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.1rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.75rem;}
+.ftxt{color:var(--t2);font-size:0.83rem;}
+/* DASHBOARD */
+.dpanel{position:fixed;top:70px;right:0;bottom:0;width:min(720px,100vw);background:var(--bg2);border-left:1px solid var(--cb);z-index:900;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;}
+.dpanel.open{transform:translateX(0);}
+.dpi{padding:1.5rem 1.5rem 3rem;position:relative;min-height:100%;}
+.dbk{position:fixed;inset:0;top:70px;background:rgba(0,0,0,0.4);z-index:899;display:none;backdrop-filter:blur(2px);}
+.dbk.open{display:block;}
+.dph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.2rem;padding-bottom:1.2rem;border-bottom:1px solid var(--cb);}
+.ctb{padding:0.5rem 1.2rem;border-radius:8px;border:1px solid var(--cb);background:transparent;color:var(--t2);cursor:pointer;font-size:0.85rem;font-weight:600;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all var(--tr);}
+.ctb:hover{border-color:var(--ac);color:var(--ac);}
+.abg{display:inline-flex;align-items:center;padding:0.25rem 0.8rem;border-radius:20px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);color:var(--ac);font-size:0.72rem;font-weight:700;letter-spacing:1px;margin-bottom:0.4rem;}
+.plt{font-family:'Orbitron',sans-serif;font-size:0.72rem;letter-spacing:2px;font-weight:700;margin-bottom:0.75rem;text-transform:uppercase;}
+.plt.si{color:var(--ac);}.plt.ca{color:var(--ac2);}
+.dline{height:1px;background:var(--cb);margin:1.2rem 0;}
+.dnav{display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+.dnb{padding:0.45rem 0.8rem;border-radius:8px;border:1px solid var(--cb);background:transparent;color:var(--t2);cursor:pointer;font-size:0.8rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
+.dnb:hover,.dnb.active{background:var(--ac);color:#000;border-color:transparent;}
+.lob{color:#ef4444!important;}.lob:hover{background:#ef4444!important;color:#fff!important;}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.2rem;}
+.dc{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:1.2rem;}
+.dct{font-size:0.75rem;font-weight:600;color:var(--t2);margin-bottom:0.5rem;letter-spacing:1px;text-transform:uppercase;}
+.dcv{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:700;color:var(--ac);}
+.dsec{display:none;}.dsec.active{display:block;}
+.ow{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);overflow:hidden;margin-top:0.5rem;}
+.oh{padding:1rem 1.4rem;border-bottom:1px solid var(--cb);font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;}
+.tscroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{padding:0.65rem 0.9rem;text-align:left;font-size:0.76rem;color:var(--t2);border-bottom:1px solid var(--cb);}
+td{padding:0.65rem 0.9rem;font-size:0.83rem;border-bottom:1px solid rgba(255,255,255,0.04);}
+.sb{padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-weight:700;}
+.sp{background:rgba(245,158,11,0.15);color:var(--ac3);}
+.spr{background:rgba(0,212,255,0.15);color:var(--ac);}
+.sdel{background:rgba(16,185,129,0.15);color:#10b981;}
+.sded{background:rgba(239,68,68,0.15);color:#ef4444;}
+.tkb{padding:0.28rem 0.7rem;border-radius:6px;border:none;cursor:pointer;background:rgba(16,185,129,0.15);color:#10b981;font-size:0.73rem;font-weight:700;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
+.tkb:hover{background:#10b981;color:#fff;}
+.rpb{padding:0.28rem 0.7rem;border-radius:6px;border:none;cursor:pointer;background:rgba(245,158,11,0.15);color:var(--ac3);font-size:0.73rem;font-weight:700;font-family:'DM Sans',sans-serif;margin-left:4px;transition:all var(--tr);}
+.rpb:hover{background:var(--ac3);color:#000;}
+.fg{margin-bottom:1.1rem;}
+.fl{font-size:0.83rem;font-weight:600;color:var(--t2);margin-bottom:0.35rem;display:block;}
+.fi{width:100%;padding:0.8rem 1rem;border-radius:10px;background:var(--bg3);border:1px solid var(--cb);color:var(--text);font-family:'DM Sans',sans-serif;font-size:1rem;outline:none;transition:border-color var(--tr);}
+.fi:focus{border-color:var(--ac);}
+.fi::placeholder{color:var(--t2);}
+.pw{position:relative;}.pw .fi{padding-right:3rem;}
+.pe{position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:0.83rem;padding:0;}
+.ae{color:#ef4444;font-size:0.8rem;margin-top:0.4rem;display:none;}
+.aok{color:#10b981;font-size:0.8rem;margin-top:0.4rem;display:none;}
+.ci2{width:100%;padding:1rem;border-radius:10px;background:var(--bg3);border:2px solid var(--cb);color:var(--text);font-family:'Orbitron',sans-serif;font-size:1.4rem;outline:none;text-align:center;letter-spacing:8px;transition:border-color var(--tr);}
+.ci2:focus{border-color:var(--ac);}
+.rb{background:none;border:none;color:var(--ac);cursor:pointer;font-size:0.83rem;font-family:'DM Sans',sans-serif;text-decoration:underline;margin-top:0.75rem;}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:2000;display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(8px);}
+.mo.open{display:flex;}
+.md{background:var(--bg2);border:1px solid var(--cb);border-radius:20px;padding:2.5rem;max-width:440px;width:100%;position:relative;animation:slideUp 0.3s ease;max-height:90vh;overflow-y:auto;}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.mc{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--t2);font-size:1.3rem;cursor:pointer;line-height:1;}
+.mttl{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:0.3rem;}
+.msub{color:var(--t2);font-size:0.875rem;margin-bottom:1.5rem;}
+.mpk{background:var(--card);border:1px solid var(--cb);border-radius:10px;padding:1rem;margin-bottom:1.2rem;display:flex;justify-content:space-between;align-items:center;}
+.mpp{color:var(--ac);font-family:'Orbitron',sans-serif;font-weight:700;}
+.mbtn{width:100%;padding:0.85rem;margin-top:0.5rem;}
+.atabs{display:flex;margin-bottom:1.5rem;border-radius:10px;overflow:hidden;border:1px solid var(--cb);}
+.atab{flex:1;padding:0.65rem;text-align:center;cursor:pointer;font-weight:600;font-size:0.875rem;background:transparent;border:none;color:var(--t2);font-family:'DM Sans',sans-serif;transition:all var(--tr);}
+.atab.active{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;}
+.divr{text-align:center;color:var(--t2);font-size:0.8rem;margin:1rem 0;position:relative;}
+.divr::before,.divr::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--cb);}
+.divr::before{left:0;}.divr::after{right:0;}
+.nhint{font-size:0.78rem;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);border-radius:8px;padding:0.5rem 0.75rem;margin-bottom:1rem;color:var(--ac);}
+.payrow{display:flex;gap:0.75rem;margin-top:0.5rem;}
+.payrow .btn{flex:1;padding:0.75rem;}
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;background:var(--bg2);border:1px solid var(--cb);border-radius:12px;padding:1rem 1.5rem;max-width:320px;box-shadow:0 10px 40px rgba(0,0,0,0.3);display:none;}
+.toast.show{display:block;animation:toastIn 0.3s ease;}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.ttt{font-weight:700;margin-bottom:0.3rem;}.tmsg{font-size:0.85rem;color:var(--t2);}
+.spin{width:40px;height:40px;border:3px solid var(--cb);border-top-color:var(--ac);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.adot{width:9px;height:9px;border-radius:50%;background:var(--ac);display:inline-block;animation:da 1.4s ease-in-out infinite;}
+.adot:nth-child(2){animation-delay:0.2s;}.adot:nth-child(3){animation-delay:0.4s;}
+@keyframes da{0%,80%,100%{transform:scale(0.6);opacity:0.4;}40%{transform:scale(1);opacity:1;}}
+@media(max-width:900px){.supgrid{grid-template-columns:1fr;}}
+@media(max-width:1100px){#plansDashSplit{grid-template-columns:1fr!important;}#inlineDash{display:none!important;}}
+@media(max-width:768px){.nav-links{display:none;flex-direction:column;position:absolute;top:70px;left:0;right:0;background:var(--bg2);padding:1rem 5%;border-bottom:1px solid var(--cb);}.nav-links.open{display:flex;}.ham{display:flex;}.ht{font-size:2.2rem;}.pgrid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.pgrid{grid-template-columns:1fr;}.payrow{flex-direction:column;}}
+.hidden{display:none!important;}
+/* Inline dash scrollbar */
+#inlineDash::-webkit-scrollbar{width:4px;}
+#inlineDash::-webkit-scrollbar-track{background:var(--bg3);}
+#inlineDash::-webkit-scrollbar-thumb{background:var(--cb);border-radius:2px;}
+#ilOrders::-webkit-scrollbar,#ilTx::-webkit-scrollbar{width:3px;}
+#ilOrders::-webkit-scrollbar-thumb,#ilTx::-webkit-scrollbar-thumb{background:var(--cb);border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="bg"><div class="bg-grid"></div></div>
+
+<nav>
+  <button class="logo" onclick="showPublic()">&#x2B21; ZONE DATA HUB</button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#hero">Home</a></li><li><a href="#plans">Data Plans</a></li>
+    <li><a href="#how">How It Works</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#support">Support</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="tw"><span class="tl" id="thLabel">Dark</span><button class="tt" onclick="toggleTheme()"></button></div>
+    <div id="abtns">
+      <button class="btn bg2b" onclick="openAuth('login')">Login</button>
+      <button class="btn bp" onclick="openAuth('register')">Register</button>
+    </div>
+    <button class="btn bp" id="mab" onclick="openDash()" style="display:none;">&#x1F464; My Account</button>
+    <button class="ham" onclick="toggleNav()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div id="publicView">
+<section id="hero">
+<div class="hi">
+  <div class="hbadge"><span class="pdot"></span>Ghana's #1 Data Bundle Platform</div>
+  <h1 class="ht">Fast. Affordable.<br><span class="hl">Data at Your Fingertips.</span></h1>
+  <p class="hs">Buy MTN &amp; Telecel data bundles instantly. Reliable data delivered right to your number.</p>
+  <div class="hc">
+    <button class="btn bp" onclick="scrollToPlans()">&#x1F525; View Offers</button>
+    <button class="btn bg2b" onclick="openDash()">&#x1F4CA; Dashboard</button>
+  </div>
+  <div class="hst">
+    <div class="sv"><div class="sn">500+</div><div class="sl">Happy Customers</div></div>
+    <div class="sv"><div class="sn">99%</div><div class="sl">Delivery Rate</div></div>
+    <div class="sv"><div class="sn">~30min</div><div class="sl">Avg. Delivery</div></div>
+  </div>
+</div>
+</section>
+
+<section id="how">
+  <p class="stag">THE PROCESS</p><h2 class="stit">How It Works</h2><p class="ssub">Four simple steps and you are connected.</p>
+  <div class="sgrid">
+    <div class="sc"><div class="scn">01</div><div class="sic">&#x1F4E6;</div><div class="stl">Choose a Plan</div><div class="sds">Browse MTN or Telecel bundles and pick what fits your needs.</div></div>
+    <div class="sc"><div class="scn">02</div><div class="sic">&#x1F4F1;</div><div class="stl">Enter Your Number</div><div class="sds">Input the phone number you want data delivered to.</div></div>
+    <div class="sc"><div class="scn">03</div><div class="sic">&#x1F4B3;</div><div class="stl">Make Payment</div><div class="sds">Pay via Paystack (card/mobile money) or use your wallet balance.</div></div>
+    <div class="sc"><div class="scn">04</div><div class="sic">&#x26A1;</div><div class="stl">Data Delivered!</div><div class="sds">Your data bundle is delivered within ~30 minutes.</div></div>
+  </div>
+</section>
+
+<section id="plans">
+  <p class="stag" style="text-align:center;">DATA BUNDLES</p>
+  <h2 class="stit" style="text-align:center;">Explore Plans</h2>
+  <p class="ssub" style="text-align:center;margin:0 auto 2rem;">Best rates in Ghana for MTN and Telecel.</p>
+  <!-- Split layout: Plans on left, Dashboard on right -->
+  <div id="plansDashSplit" style="display:grid;grid-template-columns:1fr 420px;gap:2rem;max-width:1400px;margin:0 auto;align-items:start;">
+  <div id="plansLeft">
+  <div class="ptabs">
+    <button class="tbtn active" id="tabMTN" onclick="switchTab('mtn')">&#x1F4F6; MTN</button>
+    <button class="tbtn" id="tabTEL" onclick="switchTab('telecel')">&#x1F4E1; Telecel</button>
+  </div>
+  <div id="mtnPlans" class="pgrid">
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">1<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;5.50<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','1GB','GH&#8373;5.50',5.50)">Order Now</button></div>
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">2<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;12.00<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','2GB','GH&#8373;12.00',12.00)">Order Now</button></div>
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">3<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;17.50<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','3GB','GH&#8373;17.50',17.50)">Order Now</button></div>
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">4<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;24.50<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','4GB','GH&#8373;24.50',24.50)">Order Now</button></div>
+    <div class="pc"><div class="pbdg">Popular</div><div class="pnet mtn">MTN</div><div class="psz">5<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;29.50<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','5GB','GH&#8373;29.50',29.50)">Order Now</button></div>
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">6<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;35.00<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','6GB','GH&#8373;35.00',35.00)">Order Now</button></div>
+    <div class="pc"><div class="pnet mtn">MTN</div><div class="psz">8<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;49.00<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','8GB','GH&#8373;49.00',49.00)">Order Now</button></div>
+    <div class="pc"><div class="pbdg">Best Value</div><div class="pnet mtn">MTN</div><div class="psz">10<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;57.50<span>/bundle</span></div><button class="bord" onclick="openOrder('MTN','10GB','GH&#8373;57.50',57.50)">Order Now</button></div>
+  </div>
+  <div id="telPlans" class="pgrid hidden">
+    <div class="pc"><div class="pnet tel">TELECEL</div><div class="psz">5<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;28.00<span>/bundle</span></div><button class="bord" onclick="openOrder('Telecel','5GB','GH&#8373;28.00',28.00)">Order Now</button></div>
+    <div class="pc"><div class="pbdg">Popular</div><div class="pnet tel">TELECEL</div><div class="psz">10<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;51.00<span>/bundle</span></div><button class="bord" onclick="openOrder('Telecel','10GB','GH&#8373;51.00',51.00)">Order Now</button></div>
+    <div class="pc"><div class="pnet tel">TELECEL</div><div class="psz">15<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;72.00<span>/bundle</span></div><button class="bord" onclick="openOrder('Telecel','15GB','GH&#8373;72.00',72.00)">Order Now</button></div>
+    <div class="pc"><div class="pbdg">Best Value</div><div class="pnet tel">TELECEL</div><div class="psz">20<span style="font-size:1rem">GB</span></div><div class="ppr">GH&#8373;95.00<span>/bundle</span></div><button class="bord" onclick="openOrder('Telecel','20GB','GH&#8373;95.00',95.00)">Order Now</button></div>
+  </div>
+  </div><!-- end plansLeft -->
+
+  <!-- RIGHT COLUMN: Inline Dashboard beside plans -->
+  <div id="inlineDash" style="position:sticky;top:90px;background:var(--bg2);border:1px solid var(--cb);border-radius:var(--r);overflow:hidden;max-height:calc(100vh - 100px);overflow-y:auto;">
+    <!-- Not logged in state -->
+    <div id="inlinePreLogin" style="padding:1.5rem;text-align:center;">
+      <div style="font-size:2rem;margin-bottom:0.5rem;">&#x1F464;</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-bottom:0.3rem;">My Account</div>
+      <p style="color:var(--t2);font-size:0.8rem;margin-bottom:1rem;line-height:1.5;">Login to see your wallet, orders and transactions live here.</p>
+      <button class="btn bp" style="width:100%;padding:0.7rem;margin-bottom:0.5rem;" onclick="openAuth('login')">Login</button>
+      <button class="btn bg2b" style="width:100%;padding:0.7rem;" onclick="openAuth('register')">Register</button>
+    </div>
+    <!-- Logged in inline dashboard -->
+    <div id="inlineLoggedIn" style="display:none;padding:1rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid var(--cb);">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:800;" id="ilGreet">Welcome!</div>
+          <div style="color:var(--t2);font-size:0.75rem;" id="ilEmail"></div>
+        </div>
+        <button class="btn bg2b" style="padding:0.35rem 0.8rem;font-size:0.78rem;" onclick="logoutUser()">Logout</button>
+      </div>
+      <!-- Live wallet balance -->
+      <div style="background:linear-gradient(135deg,rgba(0,212,255,0.1),rgba(124,58,237,0.1));border:1px solid var(--cb);border-radius:10px;padding:1rem;margin-bottom:0.75rem;text-align:center;">
+        <div style="font-size:0.72rem;color:var(--t2);margin-bottom:0.25rem;text-transform:uppercase;letter-spacing:1px;">Wallet Balance</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:700;color:var(--ac);" id="ilWalBal">GH&#8373;0.00</div>
+        <button class="btn bp" style="width:100%;padding:0.5rem;font-size:0.82rem;margin-top:0.5rem;" onclick="topUp()">&#x2B06; Top Up</button>
+      </div>
+      <!-- Live stats -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.75rem;">
+        <div style="background:var(--card);border:1px solid var(--cb);border-radius:8px;padding:0.6rem;text-align:center;">
+          <div style="font-size:0.68rem;color:var(--t2);">ORDERS</div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:1.2rem;color:var(--ac);" id="ilTotOrders">0</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--cb);border-radius:8px;padding:0.6rem;text-align:center;">
+          <div style="font-size:0.68rem;color:var(--t2);">DELIVERED</div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:1.2rem;color:#10b981;" id="ilTotDel">0</div>
+        </div>
+      </div>
+      <!-- Live recent orders -->
+      <div style="font-size:0.72rem;font-weight:700;color:var(--t2);margin-bottom:0.4rem;letter-spacing:1px;text-transform:uppercase;">Recent Orders</div>
+      <div id="ilOrders" style="font-size:0.8rem;max-height:180px;overflow-y:auto;"></div>
+      <!-- Live recent transactions -->
+      <div style="font-size:0.72rem;font-weight:700;color:var(--t2);margin:0.6rem 0 0.4rem;letter-spacing:1px;text-transform:uppercase;">Recent Transactions</div>
+      <div id="ilTx" style="font-size:0.8rem;max-height:120px;overflow-y:auto;"></div>
+      <button class="btn bg2b" style="width:100%;padding:0.6rem;font-size:0.82rem;margin-top:0.75rem;" onclick="openDash()">Open Full Dashboard &#x2192;</button>
+    </div>
+  </div>
+  </div><!-- end plansDashSplit -->
+</section>
+
+<section id="reviews">
+  <p class="stag">TESTIMONIALS</p><h2 class="stit">What Our Customers Say</h2><p class="ssub">Real people across Ghana.</p>
+  <div class="rgrid">
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"Zone Data Hub is the fastest data service I have used. My 5GB MTN was on my phone within 30 minutes!"</p><div class="rau"><div class="rav">KA</div><div><div class="rnm">Kwame Asante</div><div class="rlc">Accra, Ghana</div></div></div></div>
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"Cheapest data prices in Ghana! Been buying Telecel bundles here for 3 months. Never had an issue."</p><div class="rau"><div class="rav">AF</div><div><div class="rnm">Abena Frimpong</div><div class="rlc">Kumasi, Ghana</div></div></div></div>
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"The Zone AI chat support resolved my issue so fast. Very professional service!"</p><div class="rau"><div class="rav">EO</div><div><div class="rnm">Eli Owusu</div><div class="rlc">Takoradi, Ghana</div></div></div></div>
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"Great platform! The dashboard shows all my orders in real time. So organized!"</p><div class="rau"><div class="rav">SA</div><div><div class="rnm">Sandra Acheampong</div><div class="rlc">Cape Coast, Ghana</div></div></div></div>
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"I buy data for my whole family here. Fast delivery, secure payment!"</p><div class="rau"><div class="rav">BM</div><div><div class="rnm">Benjamin Mensah</div><div class="rlc">Tamale, Ghana</div></div></div></div>
+    <div class="rc"><div class="rst">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="rtx">"Zone Data Hub has the best MTN bundles! Fast delivery, great prices. Highly recommended!"</p><div class="rau"><div class="rav">JB</div><div><div class="rnm">Joyce Boateng</div><div class="rlc">Tema, Ghana</div></div></div></div>
+  </div>
+</section>
+
+<section id="support">
+  <p class="stag" style="text-align:center;">CUSTOMER CARE</p><h2 class="stit" style="text-align:center;">We Are Here For You</h2>
+  <p class="ssub" style="text-align:center;margin:0 auto 3rem;">Chat with Zone AI or reach us directly.</p>
+  <div class="supgrid">
+    <div class="cbox">
+      <div class="chdr"><div class="cav">&#x1F916;</div><div><div class="cnm">Zone AI Assistant</div><div class="cst">Online — Always available</div></div><div class="con"></div></div>
+      <div class="cmsgs" id="chatMsgs"><div class="cmsg mai">Hello! I am Zone AI. How can I help you today?</div></div>
+      <div class="ciw"><input type="text" class="cinp" id="chatIn" placeholder="Type your message..."/><button class="csnd" onclick="sendChat()">Send</button></div>
+    </div>
+    <div class="ccard">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:1.5rem;">Contact Us</div>
+      <div class="cit"><div class="cion">&#x1F4E7;</div><div><div class="clb">Email Support</div><div class="cvl"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="255f4a4b40414451444d5047654248444c490b464a48">[email&#160;protected]</a></div></div></div>
+      <div class="cit"><div class="cion">&#x23F0;</div><div><div class="clb">Response Time</div><div class="cvl">Within 24 hours</div></div></div>
+      <div class="cit"><div class="cion">&#x1F4E6;</div><div><div class="clb">Order Issues</div><div class="cvl">Use AI chat with your Order ID</div></div></div>
+      <div class="cit"><div class="cion">&#x1F512;</div><div><div class="clb">Secure Payments</div><div class="cvl">Powered by Paystack</div></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="flogo">&#x2B21; ZONE DATA HUB</div>
+  <p class="ftxt">&#169; 2024 Zone Data Hub. Fast. Reliable. Affordable.</p>
+  <p style="margin-top:0.5rem;"><button onclick="openAdminLogin()" style="background:none;border:none;color:var(--t2);font-size:0.7rem;cursor:pointer;opacity:0.3;">Admin Access</button></p>
+</footer>
+</div>
+
+<!-- ADMIN VIEW -->
+<div id="adminView" style="display:none;min-height:100vh;padding:90px 5% 60px;">
+  <div style="color:var(--ac3);font-size:0.75rem;font-weight:700;letter-spacing:1px;margin-bottom:1.5rem;">&#x1F510; ADMIN PANEL</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+    <div><h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;">Admin Dashboard</h2><p style="color:var(--t2);font-size:0.875rem;">All orders. Mark delivered to notify customer via WhatsApp.</p></div>
+    <div style="display:flex;gap:0.5rem;"><button class="btn bg2b" onclick="loadAdminOrders()">&#x1F504; Refresh</button><button class="btn bw" onclick="logoutAdmin()">&#x1F6AA; Exit</button></div>
+  </div>
+  <div class="ow"><div class="oh">All Customer Orders</div>
+  <div class="tscroll"><table><thead><tr><th>Order ID</th><th>Customer</th><th>Package</th><th>Phone</th><th>Amount</th><th>Date</th><th>Time</th><th>Payment</th><th>Status</th><th>Action</th></tr></thead><tbody id="adminTbody"><tr><td colspan="10" style="text-align:center;color:var(--t2);padding:2rem;">Loading...</td></tr></tbody></table></div></div>
+</div>
+
+<!-- DASHBOARD PANEL -->
+<div id="dashPanel" class="dpanel">
+<div class="dpi">
+
+  <!-- Pre-login -->
+  <div id="preLogin">
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-size:2.5rem;margin-bottom:0.5rem;">&#x1F464;</div>
+      <div style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:0.3rem;">My Account</div>
+      <p style="color:var(--t2);font-size:0.875rem;line-height:1.6;">Sign in or create an account to access your orders, wallet and transactions.</p>
+    </div>
+    <p class="plt si">Sign In</p>
+    <button class="goog" onclick="googleAuth()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Login with Google account
+    </button>
+    <button class="btn bg2b" style="width:100%;padding:0.75rem;margin-bottom:0.6rem;" onclick="showEmailForm('login')">&#x1F4E7; Login with email and password</button>
+    <div class="dline"></div>
+    <p class="plt ca">Create Account</p>
+    <button class="goog" onclick="googleAuth()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Create with Google account
+    </button>
+    <button class="btn bg2b" style="width:100%;padding:0.75rem;" onclick="showEmailForm('register')">&#x1F4E7; Create with email and password</button>
+    <div id="dashEmailForm" style="display:none;margin-top:1.5rem;">
+      <div class="atabs" style="margin-bottom:1rem;">
+        <button class="atab active" id="dTabLogin" onclick="switchDashTab('login')">Login</button>
+        <button class="atab" id="dTabReg" onclick="switchDashTab('register')">Register</button>
+      </div>
+      <div id="dLoginForm">
+        <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="dEmail" placeholder="your@email.com"/></div>
+        <div class="fg"><label class="fl">Password</label><div class="pw"><input type="password" class="fi" id="dPass" placeholder="Your password"/><button class="pe" onclick="togglePw('dPass',this)">Show</button></div></div>
+        <div class="ae" id="dLoginErr"></div>
+        <button class="btn bp" style="width:100%;padding:0.85rem;margin-top:0.5rem;" id="dLoginBtn" onclick="doEmailLogin()">Login</button>
+      </div>
+      <div id="dRegForm" style="display:none;">
+        <div id="dRS1">
+          <div class="fg"><label class="fl">Full Name</label><input type="text" class="fi" id="dName" placeholder="Your full name"/></div>
+          <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="dRegEmail" placeholder="your@email.com"/></div>
+          <div class="fg"><label class="fl">Password</label><div class="pw"><input type="password" class="fi" id="dRegPass" placeholder="At least 6 characters"/><button class="pe" onclick="togglePw('dRegPass',this)">Show</button></div></div>
+          <div class="ae" id="dRegErr"></div>
+          <button class="btn bp" style="width:100%;padding:0.85rem;margin-top:0.5rem;" id="dSendBtn" onclick="doSendOTP()">Send Verification Code</button>
+        </div>
+        <div id="dRS2" style="display:none;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:0.75rem;">&#x1F4EC;</div>
+          <p style="color:var(--t2);font-size:0.85rem;margin-bottom:1rem;">Code sent to <strong id="dOTPEmail"></strong>. Check inbox and spam.</p>
+          <input type="text" class="ci2" id="dOTPInput" placeholder="000000" maxlength="6"/>
+          <div class="ae" id="dOTPErr" style="margin-top:0.5rem;"></div>
+          <button class="btn bp" style="width:100%;padding:0.85rem;margin-top:1rem;" id="dVerifyBtn" onclick="doVerifyOTP()">Verify and Create Account</button>
+          <br/><button class="rb" onclick="doResendOTP()">Resend Code</button>
+          <br/><button class="rb" style="color:var(--t2);" onclick="dGoBack()">Go Back</button>
+        </div>
+      </div>
+      <button class="rb" style="margin-top:1rem;color:var(--t2);" onclick="hideEmailForm()">&#x2190; Back</button>
+    </div>
+  </div>
+
+  <!-- Logged-in dashboard -->
+  <div id="dashLoggedIn" style="display:none;">
+    <div class="dph">
+      <div>
+        <div class="abg">&#x1F464; MY ACCOUNT</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;" id="dashGreet">Welcome back!</div>
+        <div style="color:var(--t2);font-size:0.83rem;margin-top:0.2rem;" id="dashEmail"></div>
+      </div>
+      <button class="ctb" onclick="closeDash()">Close tab</button>
+    </div>
+    <div class="dnav">
+      <button class="dnb active" id="btnOrders" onclick="switchDash('orders')">&#x1F4E6; Orders</button>
+      <button class="dnb" id="btnTx" onclick="switchDash('transactions')">&#x1F4B0; Transactions</button>
+      <button class="dnb" id="btnStatus" onclick="switchDash('status')">&#x1F4E1; Status</button>
+      <button class="dnb" id="btnWallet" onclick="switchDash('wallet')">&#x1F45B; Wallet</button>
+      <button class="dnb" id="btnPassword" onclick="switchDash('password')">&#x1F511; Password</button>
+      <button class="dnb" onclick="topUp()">&#x2B06; Top Up</button>
+      <button class="dnb" onclick="refreshDash()">&#x1F504; Refresh</button>
+      <button class="dnb lob" onclick="logoutUser()">&#x1F6AA; Logout</button>
+    </div>
+    <div class="dgrid">
+      <div class="dc"><div class="dct">Wallet Balance</div><div class="dcv" id="walBal">GH&#8373;0.00</div></div>
+      <div class="dc"><div class="dct">Total Orders</div><div class="dcv" id="totOrders">0</div></div>
+      <div class="dc"><div class="dct">Delivered</div><div class="dcv" id="totDel">0</div></div>
+    </div>
+
+    <div class="dsec active" id="secOrders">
+      <div class="ow"><div class="oh">&#x1F4E6; My Orders</div>
+      <div class="tscroll"><table><thead><tr><th>Order ID</th><th>Package</th><th>Phone</th><th>Amount</th><th>Date</th><th>Time</th><th>Payment</th><th>Status</th><th>Report</th></tr></thead>
+      <tbody id="ordersTbody"><tr><td colspan="9" style="text-align:center;color:var(--t2);padding:2rem;"><span class="adot"></span><span class="adot"></span><span class="adot"></span></td></tr></tbody></table></div></div>
+    </div>
+
+    <div class="dsec" id="secTransactions">
+      <div class="ow"><div class="oh">&#x1F4B0; Transaction History</div>
+      <div class="tscroll"><table><thead><tr><th>Type</th><th>Amount</th><th>Description</th><th>Date</th><th>Time</th></tr></thead>
+      <tbody id="txTbody"><tr><td colspan="5" style="text-align:center;color:var(--t2);padding:2rem;"><span class="adot"></span><span class="adot"></span><span class="adot"></span></td></tr></tbody></table></div></div>
+    </div>
+
+    <div class="dsec" id="secStatus">
+      <div class="ow"><div class="oh">&#x1F4E1; Order Status</div>
+      <div class="tscroll"><table><thead><tr><th>Order ID</th><th>Package</th><th>Phone</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody id="statusTbody"><tr><td colspan="5" style="text-align:center;color:var(--t2);padding:2rem;"><span class="adot"></span><span class="adot"></span><span class="adot"></span></td></tr></tbody></table></div></div>
+    </div>
+
+    <div class="dsec" id="secWallet">
+      <div class="dc" style="max-width:420px;">
+        <div class="dct">&#x1F45B; Wallet Balance</div>
+        <div class="dcv" id="walBal2">GH&#8373;0.00</div>
+        <p style="color:var(--t2);font-size:0.83rem;margin-top:0.5rem;margin-bottom:1rem;">Top up your wallet then use wallet balance to pay for orders instantly.</p>
+        <button class="btn bp" style="width:100%;padding:0.9rem;" onclick="topUp()">&#x2B06; Top Up Now</button>
+      </div>
+    </div>
+
+    <div class="dsec" id="secPassword">
+      <div style="max-width:420px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:0.3rem;">&#x1F511; Change Password</div>
+        <p style="color:var(--t2);font-size:0.83rem;margin-bottom:1.5rem;line-height:1.6;">Only email/password accounts can change password here. Your new password is tied to your account email only.</p>
+        <div id="pwEmailUI">
+          <div class="fg"><label class="fl">Current Password</label><div class="pw"><input type="password" class="fi" id="pwCurrent" placeholder="Enter current password"/><button class="pe" onclick="togglePw('pwCurrent',this)">Show</button></div></div>
+          <div class="fg"><label class="fl">New Password</label><div class="pw"><input type="password" class="fi" id="pwNew" placeholder="At least 6 characters"/><button class="pe" onclick="togglePw('pwNew',this)">Show</button></div></div>
+          <div class="fg"><label class="fl">Confirm New Password</label><div class="pw"><input type="password" class="fi" id="pwConfirm" placeholder="Re-enter new password"/><button class="pe" onclick="togglePw('pwConfirm',this)">Show</button></div></div>
+          <div class="ae" id="pwErr"></div>
+          <div class="aok" id="pwOk"></div>
+          <button class="btn bp" style="width:100%;padding:0.9rem;" id="pwSaveBtn" onclick="changePassword()">&#x1F4BE; Save New Password</button>
+        </div>
+        <div id="pwGoogleUI" style="display:none;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:1.2rem;color:var(--t2);font-size:0.875rem;line-height:1.6;">
+          &#x1F4AC; Your account uses Google Sign-In. To change your password, go to <strong>myaccount.google.com</strong>.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+<div id="dashBackdrop" class="dbk"></div>
+
+<!-- ORDER MODAL -->
+<div class="mo" id="orderModal">
+<div class="md">
+  <button class="mc" onclick="closeModal('orderModal')">&#x2715;</button>
+  <div class="mttl">&#x1F6D2; Place Your Order</div>
+  <div class="msub">Enter the number to receive the data bundle.</div>
+  <div class="mpk">
+    <div><div style="font-size:0.75rem;color:var(--t2);" id="ordNet"></div><div style="font-weight:700;" id="ordPkg"></div></div>
+    <div class="mpp" id="ordPrice"></div>
+  </div>
+  <div id="netHint" class="nhint"></div>
+  <div class="fg"><label class="fl">&#x1F4F1; Recipient Phone Number</label><input type="tel" class="fi" id="recNum" placeholder="e.g. 0241234567" maxlength="10"/></div>
+  <div class="fg"><label class="fl">&#x2705; Confirm Phone Number</label><input type="tel" class="fi" id="recNum2" placeholder="Re-enter phone number" maxlength="10"/></div>
+  <div style="font-size:0.8rem;color:var(--t2);margin-bottom:1rem;">&#x26A0; Please double-check. Wrong numbers are not refundable.</div>
+  <div id="walletPayRow" style="display:none;">
+    <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:0.75rem 1rem;margin-bottom:0.75rem;font-size:0.875rem;">
+      &#x1F45B; Wallet balance: <strong id="modalWalBal">GH&#8373;0.00</strong>
+    </div>
+    <div class="payrow">
+      <button class="btn bp" onclick="proceedWallet()">&#x1F45B; Pay from Wallet</button>
+      <button class="btn bg2b" onclick="proceedPaystack()">&#x1F4B3; Pay with Card</button>
+    </div>
+  </div>
+  <div id="cardOnlyRow">
+    <button class="btn bp mbtn" onclick="proceedPaystack()">&#x1F4B3; Proceed to Payment</button>
+  </div>
+</div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="mo" id="reportModal">
+<div class="md">
+  <button class="mc" onclick="closeModal('reportModal')">&#x2715;</button>
+  <div class="mttl">&#x26A0; Report an Order</div>
+  <div class="msub">Describe your issue. It will be sent to support via WhatsApp immediately.</div>
+  <div class="fg"><label class="fl">Order ID</label><input type="text" class="fi" id="rpOrderId" readonly style="opacity:0.7;"/></div>
+  <div class="fg"><label class="fl">Package</label><input type="text" class="fi" id="rpPkg" readonly style="opacity:0.7;"/></div>
+  <div class="fg"><label class="fl">Describe the Problem</label><textarea class="fi" id="rpProblem" rows="3" placeholder="e.g. Data not received after 2 hours..." style="resize:vertical;"></textarea></div>
+  <div class="ae" id="rpErr"></div>
+  <button class="btn bp mbtn" onclick="submitReport()">&#x1F4AC; Send Report via WhatsApp</button>
+</div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="mo" id="authModal">
+<div class="md">
+  <button class="mc" onclick="closeModal('authModal')">&#x2715;</button>
+  <div class="mttl">Welcome to Zone Data Hub</div>
+  <div class="msub">Login or create your account</div>
+  <div class="atabs">
+    <button class="atab active" id="tabLogin" onclick="switchAuthTab('login')">Login</button>
+    <button class="atab" id="tabRegister" onclick="switchAuthTab('register')">Register</button>
+  </div>
+  <div id="loginForm">
+    <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="loginEmail" placeholder="your@email.com"/></div>
+    <div class="fg"><label class="fl">Password</label><div class="pw"><input type="password" class="fi" id="loginPass" placeholder="Your password"/><button class="pe" onclick="togglePw('loginPass',this)">Show</button></div></div>
+    <div class="ae" id="loginErr"></div>
+    <button class="btn bp mbtn" id="loginBtn" onclick="doModalLogin()">Login</button>
+    <div class="divr">or</div>
+    <button class="goog" onclick="googleAuth()"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Login with Google</button>
+  </div>
+  <div id="registerForm" style="display:none;">
+    <div id="regS1">
+      <div class="fg"><label class="fl">Full Name</label><input type="text" class="fi" id="regName" placeholder="Your full name"/></div>
+      <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="regEmail" placeholder="your@email.com"/></div>
+      <div class="fg"><label class="fl">Password</label><div class="pw"><input type="password" class="fi" id="regPass" placeholder="At least 6 characters"/><button class="pe" onclick="togglePw('regPass',this)">Show</button></div></div>
+      <div class="ae" id="regErr"></div>
+      <button class="btn bp mbtn" id="sendOTPBtn" onclick="modalSendOTP()">Send Verification Code</button>
+      <div class="divr">or</div>
+      <button class="goog" onclick="googleAuth()"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Sign up with Google</button>
+    </div>
+    <div id="regS2" style="display:none;text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#x1F4EC;</div>
+      <p style="color:var(--t2);font-size:0.875rem;margin-bottom:1.2rem;">Code sent to <strong id="otpEmailDisplay"></strong>. Check inbox and spam.</p>
+      <input type="text" class="ci2" id="otpInput" placeholder="000000" maxlength="6"/>
+      <div class="ae" id="otpErr" style="margin-top:0.5rem;"></div>
+      <button class="btn bp mbtn" id="verifyOTPBtn" onclick="modalVerifyOTP()" style="margin-top:1rem;">Verify and Create Account</button>
+      <br/><button class="rb" onclick="modalResendOTP()">Resend Code</button>
+      <br/><button class="rb" style="color:var(--t2);" onclick="goBackS1()">Go Back</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- LOGIN REQUIRED -->
+<div class="mo" id="loginRequired">
+<div class="md">
+  <button class="mc" onclick="closeModal('loginRequired')">&#x2715;</button>
+  <div style="text-align:center;font-size:2.5rem;margin-bottom:1rem;">&#x1F510;</div>
+  <div class="mttl" style="text-align:center;">Login Required</div>
+  <p class="msub" style="text-align:center;">You need an account to complete this purchase.</p>
+  <button class="btn bp mbtn" onclick="closeModal('loginRequired');openAuth('login');">Login to Continue</button>
+  <button class="btn bg2b mbtn" style="margin-top:0.5rem;" onclick="closeModal('loginRequired');openAuth('register');">Create an Account</button>
+</div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="mo" id="adminModal">
+<div class="md">
+  <button class="mc" onclick="closeModal('adminModal')">&#x2715;</button>
+  <div class="mttl" style="color:var(--ac3);">&#x1F510; Admin Access</div>
+  <div class="msub">Enter your secret admin key to continue.</div>
+  <div class="fg"><label class="fl">Admin Secret Key</label><input type="password" class="fi" id="adminKeyInput" placeholder="Enter admin key"/></div>
+  <div class="ae" id="adminErr" style="margin-bottom:0.5rem;"></div>
+  <button class="btn mbtn" style="background:linear-gradient(135deg,var(--ac3),#ef4444);color:#000;width:100%;padding:0.9rem;" onclick="verifyAdmin()">Access Admin Panel</button>
+</div>
+</div>
+
+<div class="toast" id="toast"><div class="ttt" id="toastTitle"></div><div class="tmsg" id="toastMsg"></div></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ============================================================
+// FIREBASE + EMAILJS
+// ============================================================
+firebase.initializeApp({
+  apiKey:"AIzaSyAvL4ikdDGdY-FO9HTnLXHd5s81l840zec",
+  authDomain:"zone-data-hub.firebaseapp.com",
+  projectId:"zone-data-hub",
+  storageBucket:"zone-data-hub.firebasestorage.app",
+  messagingSenderId:"415813127941",
+  appId:"1:415813127941:web:1d6f1b8cab1f3fef1d716c"
+});
+var auth=firebase.auth(), db=firebase.firestore();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+emailjs.init("c3_7QJNC0ofIS5IN6");
+var EJS_SVC="service_8f7s0z8", EJS_TMPL="template_kxmuqqs";
+
+// ============================================================
+// CONSTANTS & STATE
+// ============================================================
+var ADMIN_KEY = "ZONEHUB@ADMIN0504839130#SECURE";
+var PAY_KEY   = "pk_live_f0cc6353f3afaa28cc373e1506c089546dd55363";
+var WA_NUM    = "233531861148";
+
+var CU=null, isAdmin=false, CO={}, pendingOrder=null, otpStore={};
+var unsubWallet=null, unsubOrders=null, unsubTx=null;
+var pjl=true; setTimeout(function(){pjl=false;},3000);
+
+function el(id){return document.getElementById(id);}
+
+// ============================================================
+// AUTH STATE — updates UI instantly, Firestore in background
+// ============================================================
+auth.onAuthStateChanged(function(user){
+  if(isAdmin) return;
+  if(!user){
+    CU=null;
+    detachAll();
+    el("abtns").style.display="flex"; el("mab").style.display="none";
+    return;
+  }
+  if(CU&&CU.uid===user.uid) return;
+  CU=user;
+  var name=user.displayName||user.email.split("@")[0];
+  el("abtns").style.display="none"; el("mab").style.display="inline-flex";
+  el("dashGreet").textContent="Welcome back, "+name+"!";
+  el("dashEmail").textContent=user.email;
+  // Show inline dashboard beside plans
+  el("inlinePreLogin").style.display="none";
+  el("inlineLoggedIn").style.display="block";
+  el("ilGreet").textContent="Welcome, "+name+"!";
+  el("ilEmail").textContent=user.email;
+
+  var panelOpen=el("dashPanel").classList.contains("open");
+  if(panelOpen){
+    el("preLogin").style.display="none";
+    el("dashLoggedIn").style.display="block";
+    showToast("Signed In!","Welcome, "+name+"!");
+  } else if(!pjl){
+    if(pendingOrder){CO=pendingOrder;pendingOrder=null;showOrderModal();}
+    else{el("dashPanel").classList.add("open");el("dashBackdrop").classList.add("open");el("preLogin").style.display="none";el("dashLoggedIn").style.display="block";showToast("Signed In!","Welcome, "+name+"!");}
+  }
+  // Start all live listeners
+  startWalletLive(user.uid);
+  startOrdersLive(user.uid);
+  startTxLive(user.uid);
+  // Ensure Firestore profile exists
+  db.collection("users").doc(user.uid).get().then(function(d){
+    if(!d.exists) db.collection("users").doc(user.uid).set({name:name,email:user.email,uid:user.uid,walletBalance:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  }).catch(function(){});
+});
+
+function detachAll(){
+  if(unsubWallet){unsubWallet();unsubWallet=null;}
+  if(unsubOrders){unsubOrders();unsubOrders=null;}
+  if(unsubTx){unsubTx();unsubTx=null;}
+}
+
+// ============================================================
+// LIVE WALLET — onSnapshot on users/{uid} document
+// Updates balance display instantly whenever Firestore changes
+// ============================================================
+function startWalletLive(uid){
+  if(unsubWallet){unsubWallet();unsubWallet=null;}
+  unsubWallet=db.collection("users").doc(uid).onSnapshot(function(doc){
+    var bal=doc.exists?(doc.data().walletBalance||0):0;
+    var s="GH\u20B3 "+parseFloat(bal).toFixed(2);
+    el("walBal").textContent=s;
+    el("walBal2").textContent=s;
+    el("ilWalBal").textContent=s; // update inline dash beside plans
+  },function(e){console.warn("wallet snap:",e.message);});
+}
+
+// ============================================================
+// LIVE ORDERS — onSnapshot on users/{uid}/orders
+// Any status change (Pending→Processing→Delivered) appears instantly
+// ============================================================
+function startOrdersLive(uid){
+  if(unsubOrders){unsubOrders();unsubOrders=null;}
+  unsubOrders=db.collection("users").doc(uid).collection("orders")
+    .orderBy("createdAt","desc")
+    .onSnapshot(function(snap){
+      var orders=[]; snap.forEach(function(d){orders.push(d.data());});
+      var total=orders.length;
+      var delivered=orders.filter(function(o){return o.status==="Delivered";}).length;
+      el("totOrders").textContent=total;
+      el("totDel").textContent=delivered;
+      el("ilTotOrders").textContent=total;   // inline dash
+      el("ilTotDel").textContent=delivered;  // inline dash
+      // Update inline orders list (show latest 4)
+      var recent=orders.slice(0,4);
+      el("ilOrders").innerHTML=recent.length?recent.map(function(o){
+        var sc=o.status==="Delivered"?"#10b981":o.status==="Processing"?"var(--ac)":"var(--ac3)";
+        return "<div style='display:flex;justify-content:space-between;padding:0.4rem 0;border-bottom:1px solid var(--cb);'><span style='color:var(--t2);font-size:0.75rem;'>"+o.network+" "+o.package+"</span><span style='color:"+sc+";font-size:0.75rem;font-weight:700;'>"+o.status+"</span></div>";
+      }).join(""):"<div style='color:var(--t2);font-size:0.8rem;padding:0.5rem 0;'>No orders yet.</div>";
+      var none8="<tr><td colspan='9' style='text-align:center;color:var(--t2);padding:2rem;'>No orders yet.</td></tr>";
+      var none5="<tr><td colspan='5' style='text-align:center;color:var(--t2);padding:2rem;'>No orders yet.</td></tr>";
+      if(!orders.length){el("ordersTbody").innerHTML=none8;el("statusTbody").innerHTML=none5;return;}
+      el("ordersTbody").innerHTML=orders.map(function(o){
+        var sc=o.status==="Delivered"?"sdel":o.status==="Processing"?"spr":"sp";
+        var payMethod=o.paymentMethod||"Paystack";
+        return "<tr><td style='font-size:0.73rem'>"+o.orderId+"</td><td>"+o.network+" "+o.package+"</td><td>"+o.recipientPhone+"</td><td>"+o.price+"</td><td>"+o.date+"</td><td>"+o.time+"</td><td><span class='sb' style='background:rgba(124,58,237,0.15);color:var(--ac2)'>"+payMethod+"</span></td><td><span class='sb "+sc+"'>"+o.status+"</span></td><td><button class='rpb' onclick=\"openReport('"+o.orderId+"','"+o.network+" "+o.package+"','"+o.time+"')\">Report</button></td></tr>";
+      }).join("");
+      el("statusTbody").innerHTML=orders.map(function(o){
+        var sc=o.status==="Delivered"?"sdel":o.status==="Processing"?"spr":"sp";
+        return "<tr><td style='font-size:0.73rem'>"+o.orderId+"</td><td>"+o.network+" "+o.package+"</td><td>"+o.recipientPhone+"</td><td><span class='sb "+sc+"'>"+o.status+"</span></td><td>"+o.date+"</td></tr>";
+      }).join("");
+    },function(e){console.warn("orders snap:",e.message);});
+}
+
+// ============================================================
+// LIVE TRANSACTIONS — onSnapshot on users/{uid}/transactions
+// New records (deposit, deduction, purchase) appear instantly
+// ============================================================
+function startTxLive(uid){
+  if(unsubTx){unsubTx();unsubTx=null;}
+  var tbody=el("txTbody");
+  unsubTx=db.collection("users").doc(uid).collection("transactions")
+    .orderBy("createdAt","desc")
+    .onSnapshot(function(snap){
+      var txs=[]; snap.forEach(function(d){txs.push(d.data());});
+      // Update inline tx beside plans (latest 3)
+      var recent3=txs.slice(0,3);
+      el("ilTx").innerHTML=recent3.length?recent3.map(function(t){
+        var isIn=t.amount>0;
+        var col=isIn?"#10b981":"#ef4444";
+        var amt=(isIn?"+":"")+parseFloat(t.amount).toFixed(2);
+        return "<div style='display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid var(--cb);'><span style='color:var(--t2);font-size:0.75rem;max-width:60%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;'>"+(t.type||"Tx")+"</span><span style='color:"+col+";font-size:0.75rem;font-weight:700;'>GH&#8373; "+amt+"</span></div>";
+      }).join(""):"<div style='color:var(--t2);font-size:0.8rem;padding:0.5rem 0;'>No transactions yet.</div>";
+      if(!txs.length){tbody.innerHTML="<tr><td colspan='5' style='text-align:center;color:var(--t2);padding:2rem;'>No transactions yet.</td></tr>";return;}
+      tbody.innerHTML=txs.map(function(t){
+        var isIn=(t.amount>0);
+        var color=isIn?"#10b981":"#ef4444";
+        var sc=isIn?"sdel":"sded";
+        var amt=(isIn?"+":"")+t.amount.toFixed(2);
+        return "<tr><td><span class='sb "+sc+"'>"+t.type+"</span></td><td style='font-weight:700;color:"+color+"'>GH\u20B3 "+amt+"</td><td>"+(t.description||"")+"</td><td>"+(t.date||"")+"</td><td>"+(t.time||"")+"</td></tr>";
+      }).join("");
+    },function(e){tbody.innerHTML="<tr><td colspan='5' style='text-align:center;color:#ef4444;padding:1rem;'>Error loading. Please refresh.</td></tr>";});
+}
+
+// ============================================================
+// TOP-UP (wallet deposit)
+// Uses set+merge — works whether walletBalance field exists or not
+// Writes transaction record → onSnapshot updates both wallet & tx list
+// ============================================================
+function topUp(){
+  if(!CU){openDash();return;}
+  var amount=parseFloat(prompt("Enter deposit amount in GH\u20B3 (minimum GH\u20B3 1):"));
+  if(!amount||isNaN(amount)||amount<1){showToast("Invalid Amount","Please enter at least GH\u20B3 1.");return;}
+  PaystackPop.setup({
+    key:PAY_KEY, email:CU.email,
+    amount:Math.round(amount*100), currency:"GHS",
+    ref:"TOPUP-"+Date.now()+"-"+Math.floor(Math.random()*9999),
+    onClose:function(){showToast("Cancelled","Top-up cancelled.");},
+    callback:function(resp){
+      // SPEED FIX: FieldValue.increment() is ONE atomic write — no round trips.
+      // This is what makes balance update in under 1 second after payment.
+      // No runTransaction needed — Firestore handles the atomic add server-side.
+      var uid=CU.uid;
+      var uRef=db.collection("users").doc(uid);
+      var now=new Date();
+      var date=now.toLocaleDateString("en-GH",{day:"2-digit",month:"short",year:"numeric"});
+      var time=now.toLocaleTimeString("en-GH",{hour:"2-digit",minute:"2-digit"});
+      var batch=db.batch();
+      // Atomic increment — single write, sub-second
+      batch.set(uRef,{walletBalance:firebase.firestore.FieldValue.increment(amount)},{merge:true});
+      // Transaction record — written in same batch
+      var txRef=uRef.collection("transactions").doc("TX-TOPUP-"+Date.now());
+      batch.set(txRef,{
+        type:"Deposit", amount:amount,
+        description:"Wallet top-up via Paystack (ref:"+resp.reference+")",
+        date:date, time:time,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      batch.commit().then(function(){
+        showToast("Deposit Successful!","GH\u20B3 "+amount.toFixed(2)+" added to wallet.");
+        // onSnapshot fires within ~200ms — balance and transactions update automatically
+      }).catch(function(e){
+        console.error("Deposit err:",e.code,e.message);
+        showToast("Payment Received","Balance is updating. Please wait a moment.");
+      });
+    }
+  }).openIframe();
+}
+
+// ============================================================
+// ORDER FLOW
+// Shows wallet option if user is logged in and has balance
+// ============================================================
+function openOrder(network,pkg,price,amount){
+  CO={network:network,pkg:pkg,price:price,amount:amount};
+  el("ordNet").textContent=network;
+  el("ordPkg").textContent=pkg;
+  el("ordPrice").textContent=price;
+  el("recNum").value=""; el("recNum2").value="";
+  el("netHint").textContent=network==="MTN"?"MTN: Numbers starting with 024, 025, 053, 054, 055, or 059":"Telecel: Numbers starting with 020 or 050";
+  if(CU){
+    db.collection("users").doc(CU.uid).get().then(function(d){
+      var bal=d.exists?(d.data().walletBalance||0):0;
+      if(bal>0){
+        el("modalWalBal").textContent="GH\u20B3 "+bal.toFixed(2);
+        el("walletPayRow").style.display="block";
+        el("cardOnlyRow").style.display="none";
+      } else {
+        el("walletPayRow").style.display="none";
+        el("cardOnlyRow").style.display="block";
+      }
+    }).catch(function(){el("walletPayRow").style.display="none";el("cardOnlyRow").style.display="block";});
+  } else {
+    el("walletPayRow").style.display="none";
+    el("cardOnlyRow").style.display="block";
+  }
+  openModal("orderModal");
+}
+
+function validatePhone(num,net){
+  var n=num.replace(/\s/g,"").replace(/-/g,"");
+  if(n.length!==10||n[0]!=="0") return{valid:false,msg:"Must be 10 digits starting with 0."};
+  var p=n.substring(0,3);
+  if(net==="MTN"&&["024","025","053","054","055","059"].indexOf(p)===-1) return{valid:false,msg:"MTN: start with 024, 025, 053, 054, 055, or 059."};
+  if(net==="Telecel"&&["020","050"].indexOf(p)===-1) return{valid:false,msg:"Telecel: start with 020 or 050."};
+  return{valid:true};
+}
+
+function validateOrderInputs(){
+  var n1=el("recNum").value.trim(), n2=el("recNum2").value.trim();
+  if(!n1||n1.length<10){showToast("Error","Please enter a valid 10-digit phone number.");return null;}
+  if(n1!==n2){showToast("Mismatch","Phone numbers do not match.");return null;}
+  var v=validatePhone(n1,CO.network); if(!v.valid){showToast("Invalid",v.msg);return null;}
+  return n1;
+}
+
+// ============================================================
+// PAY FROM WALLET
+// Deducts from walletBalance atomically + writes order + writes
+// deduction transaction → all onSnapshot listeners update live
+// ============================================================
+function proceedWallet(){
+  var phone=validateOrderInputs(); if(!phone) return;
+  CO.phone=phone;
+  if(!CU){pendingOrder=Object.assign({},CO);closeModal("orderModal");openModal("loginRequired");return;}
+  // Check balance first (fast read), then deduct atomically
+  var uRef=db.collection("users").doc(CU.uid);
+  uRef.get().then(function(doc){
+    var bal=doc.exists?(doc.data().walletBalance||0):0;
+    if(bal<CO.amount){
+      showToast("Insufficient Balance","Your wallet balance (GH\u20B3"+bal.toFixed(2)+") is not enough. Please top up first.");
+      return;
+    }
+    // SPEED FIX: Use FieldValue.increment(-amount) for instant atomic deduction
+    // + batch all writes together so everything lands in ONE round trip
+    var now=new Date();
+    var orderId="ORD-"+Date.now();
+    var date=now.toLocaleDateString("en-GH",{day:"2-digit",month:"short",year:"numeric"});
+    var time=now.toLocaleTimeString("en-GH",{hour:"2-digit",minute:"2-digit"});
+    var orderData={
+      orderId:orderId, network:CO.network, package:CO.pkg,
+      price:CO.price, amount:CO.amount, recipientPhone:CO.phone,
+      customerEmail:CU.email, customerName:CU.displayName||CU.email.split("@")[0],
+      customerUid:CU.uid, date:date, time:time,
+      status:"Pending", paymentMethod:"Wallet",
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    };
+    var batch=db.batch();
+    // Atomic deduction — single write
+    batch.set(uRef,{walletBalance:firebase.firestore.FieldValue.increment(-CO.amount)},{merge:true});
+    // Order in global collection (admin sees)
+    batch.set(db.collection("orders").doc(orderId),orderData);
+    // Order in user's collection (user's dashboard)
+    batch.set(uRef.collection("orders").doc(orderId),orderData);
+    // Deduction transaction record
+    batch.set(uRef.collection("transactions").doc("TX-"+Date.now()),{
+      type:"Deduction", amount:-CO.amount,
+      description:"Data purchase: "+CO.network+" "+CO.pkg+" for "+CO.phone,
+      orderId:orderId, date:date, time:time,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    return batch.commit().then(function(){
+      return {orderId:orderId,date:date,time:time};
+    });
+  }).then(function(info){
+    if(!info) return; // insufficient balance case
+    closeModal("orderModal");
+    showToast("Order Placed!",CO.network+" "+CO.pkg+" for "+CO.phone+". ID: "+info.orderId);
+    // onSnapshot fires within ~200ms — order appears live on dashboard
+    setTimeout(function(){
+      db.collection("orders").doc(info.orderId).update({status:"Processing"});
+      db.collection("users").doc(CU.uid).collection("orders").doc(info.orderId).update({status:"Processing"});
+    },3*60*1000);
+    sendWAOrder(info.orderId,info.date,info.time);
+  }).catch(function(e){
+    console.error("Wallet pay err:",e);
+    showToast("Error","Could not process wallet payment. Please try again.");
+  });
+}
+
+// ============================================================
+// PAY WITH PAYSTACK (direct card/mobile money)
+// Saves order + writes "Purchase" transaction → both live
+// ============================================================
+function proceedPaystack(){
+  var phone=validateOrderInputs(); if(!phone) return;
+  CO.phone=phone;
+  if(!CU){pendingOrder=Object.assign({},CO);closeModal("orderModal");openModal("loginRequired");return;}
+  closeModal("orderModal");
+  PaystackPop.setup({
+    key:PAY_KEY, email:CU.email,
+    amount:Math.round(CO.amount*100), currency:"GHS",
+    ref:"ZDH-"+Date.now(),
+    onClose:function(){showToast("Cancelled","Payment cancelled.");},
+    callback:function(resp){saveOrderPaystack(resp.reference);}
+  }).openIframe();
+}
+
+function saveOrderPaystack(ref){
+  // All writes in one batch = one network round trip = sub-second appearance on dashboard
+  var now=new Date();
+  var orderId="ORD-"+Date.now();
+  var date=now.toLocaleDateString("en-GH",{day:"2-digit",month:"short",year:"numeric"});
+  var time=now.toLocaleTimeString("en-GH",{hour:"2-digit",minute:"2-digit"});
+  var uid=CU.uid;
+  var orderData={
+    orderId:orderId, reference:ref, network:CO.network, package:CO.pkg,
+    price:CO.price, amount:CO.amount, recipientPhone:CO.phone,
+    customerEmail:CU.email, customerName:CU.displayName||CU.email.split("@")[0],
+    customerUid:uid, date:date, time:time,
+    status:"Pending", paymentMethod:"Paystack",
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  };
+  var uRef=db.collection("users").doc(uid);
+  var batch=db.batch();
+  batch.set(db.collection("orders").doc(orderId),orderData);        // admin sees
+  batch.set(uRef.collection("orders").doc(orderId),orderData);     // user sees live
+  batch.set(uRef.collection("transactions").doc("TX-"+Date.now()),{ // tx history live
+    type:"Purchase", amount:-CO.amount,
+    description:"Data purchase: "+CO.network+" "+CO.pkg+" for "+CO.phone+" (Paystack)",
+    orderId:orderId, date:date, time:time,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+  // All 3 documents written simultaneously — onSnapshot fires for all within ~200ms
+  batch.commit().then(function(){
+    closeModal("orderModal");
+    showToast("Order Placed!",CO.network+" "+CO.pkg+" for "+CO.phone+". ID: "+orderId);
+    setTimeout(function(){
+      var upd={status:"Processing"};
+      db.collection("orders").doc(orderId).update(upd);
+      uRef.collection("orders").doc(orderId).update(upd);
+    },3*60*1000);
+    sendWAOrder(orderId,date,time); // WhatsApp within 1 second
+  }).catch(function(e){
+    console.error("Save order err:",e);
+    showToast("Error","Order save failed. Contact support.");
+  });
+}
+
+function sendWAOrder(orderId,date,time){
+  var msg="NEW ORDER - ZONE DATA HUB\n\nOrder ID: "+orderId+"\nDate: "+date+"\nTime: "+time+"\nPackage: "+CO.network+" "+CO.pkg+"\nAmount: "+CO.price+"\nPhone: "+CO.phone+"\nCustomer: "+CU.email;
+  window.open("https://wa.me/"+WA_NUM+"?text="+encodeURIComponent(msg),"_blank");
+}
+
+// ============================================================
+// ORDER REPORT — sends WhatsApp with Order Time, ID, Package
+// ============================================================
+function openReport(orderId,pkg,time){
+  el("rpOrderId").value=orderId; el("rpPkg").value=pkg; el("rpProblem").value="";
+  el("rpErr").style.display="none"; el("reportModal").dataset.otime=time;
+  openModal("reportModal");
+}
+function submitReport(){
+  var prob=el("rpProblem").value.trim();
+  if(!prob){el("rpErr").textContent="Please describe the problem.";el("rpErr").style.display="block";return;}
+  var msg="ORDER REPORT - ZONE DATA HUB\n\nOrder ID: "+el("rpOrderId").value+"\nOrder Time: "+el("reportModal").dataset.otime+"\nPackage: "+el("rpPkg").value+"\nCustomer: "+(CU?CU.email:"Unknown")+"\nProblem: "+prob;
+  window.open("https://wa.me/"+WA_NUM+"?text="+encodeURIComponent(msg),"_blank");
+  closeModal("reportModal");
+  showToast("Report Sent!","Support notified via WhatsApp.");
+}
+
+// ============================================================
+// ADMIN
+// ============================================================
+function openAdminLogin(){openModal("adminModal");}
+function verifyAdmin(){
+  if(el("adminKeyInput").value===ADMIN_KEY){
+    closeModal("adminModal"); isAdmin=true;
+    el("publicView").style.display="none"; el("adminView").style.display="block";
+    loadAdminOrders();
+  } else {el("adminErr").textContent="Incorrect admin key.";el("adminErr").style.display="block";}
+}
+function logoutAdmin(){isAdmin=false;el("adminView").style.display="none";el("publicView").style.display="block";}
+function loadAdminOrders(){
+  db.collection("orders").orderBy("createdAt","desc").get().then(function(snap){
+    var os=[]; snap.forEach(function(d){os.push(Object.assign({id:d.id},d.data()));});
+    el("adminTbody").innerHTML=os.length?os.map(function(o){
+      var sc=o.status==="Delivered"?"sdel":o.status==="Processing"?"spr":"sp";
+      var btn=o.status==="Delivered"?"<span style='color:#10b981;font-weight:700;'>Done</span>":"<button class='tkb' onclick=\"markDelivered('"+o.orderId+"','"+(o.customerUid||"")+"','"+o.recipientPhone+"','"+o.package+"','"+o.network+"')\">Mark Delivered</button>";
+      return "<tr><td style='font-size:0.72rem'>"+o.orderId+"</td><td>"+(o.customerEmail||"")+"</td><td>"+o.network+" "+o.package+"</td><td>"+o.recipientPhone+"</td><td>"+o.price+"</td><td>"+o.date+"</td><td>"+o.time+"</td><td>"+(o.paymentMethod||"Paystack")+"</td><td><span class='sb "+sc+"'>"+o.status+"</span></td><td>"+btn+"</td></tr>";
+    }).join(""):"<tr><td colspan='10' style='text-align:center;color:var(--t2);padding:2rem;'>No orders yet.</td></tr>";
+  });
+}
+function markDelivered(orderId,uid,phone,pkg,network){
+  db.collection("orders").doc(orderId).update({status:"Delivered"}).then(function(){
+    if(uid&&uid!=="guest") db.collection("users").doc(uid).collection("orders").doc(orderId).update({status:"Delivered"});
+    showToast("Delivered!","Order "+orderId+" marked as delivered.");
+    var msg="ZONE DATA HUB\n\nYour "+network+" "+pkg+" data bundle has been sent to ("+phone+").\n\nThank you for choosing Zone Data Hub!";
+    window.open("https://wa.me/233"+phone.substring(1)+"?text="+encodeURIComponent(msg),"_blank");
+    loadAdminOrders();
+  });
+}
+
+// ============================================================
+// AUTH — Google
+// ============================================================
+function googleAuth(){
+  var p=new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({prompt:"select_account"});
+  auth.signInWithPopup(p).then(function(){closeModal("authModal");}).catch(function(e){
+    if(e.code==="auth/popup-closed-by-user"||e.code==="auth/cancelled-popup-request") return;
+    showToast("Sign-In Failed",e.code==="auth/popup-blocked"?"Allow popups for this site.":"Google sign-in failed.");
+  });
+}
+
+// ============================================================
+// AUTH — Email Login (modal + dashboard)
+// ============================================================
+function doModalLogin(){
+  var em=el("loginEmail").value.trim(), pw=el("loginPass").value;
+  var err=el("loginErr"); err.style.display="none";
+  if(!em||!pw){err.textContent="Please enter email and password.";err.style.display="block";return;}
+  var btn=el("loginBtn"); btn.disabled=true; btn.textContent="Signing in...";
+  auth.signInWithEmailAndPassword(em,pw).then(function(){closeModal("authModal");}).catch(function(e){
+    btn.disabled=false; btn.textContent="Login";
+    err.textContent=e.code==="auth/user-not-found"?"No account found. Please register first.":e.code==="auth/wrong-password"?"Incorrect password.":e.code==="auth/too-many-requests"?"Too many attempts. Please wait.":"Incorrect email or password.";
+    err.style.display="block";
+  });
+}
+function doEmailLogin(){
+  var em=el("dEmail").value.trim(), pw=el("dPass").value;
+  var err=el("dLoginErr"); err.style.display="none";
+  if(!em||!pw){err.textContent="Please enter email and password.";err.style.display="block";return;}
+  var btn=el("dLoginBtn"); btn.disabled=true; btn.textContent="Signing in...";
+  auth.signInWithEmailAndPassword(em,pw).catch(function(e){
+    btn.disabled=false; btn.textContent="Login";
+    err.textContent=e.code==="auth/user-not-found"?"No account found. Please create one.":e.code==="auth/too-many-requests"?"Too many attempts. Please wait.":"Incorrect email or password.";
+    err.style.display="block";
+  });
+}
+
+// ============================================================
+// AUTH — OTP Signup
+// ============================================================
+function genOTP(){return String(((Date.now()%10000*7+Math.floor(Math.random()*9000)+1000)%900000)+100000);}
+
+function modalSendOTP(){
+  var nm=el("regName").value.trim(),em=el("regEmail").value.trim(),pw=el("regPass").value;
+  var err=el("regErr"); err.style.display="none";
+  if(!nm||!em||!pw){err.textContent="Please fill in all fields.";err.style.display="block";return;}
+  if(pw.length<6){err.textContent="Password must be at least 6 characters.";err.style.display="block";return;}
+  if(!em.includes("@")){err.textContent="Please enter a valid email.";err.style.display="block";return;}
+  var btn=el("sendOTPBtn"); btn.disabled=true; btn.textContent="Sending...";
+  var code=genOTP(); otpStore[em]={code:code,exp:Date.now()+15*60*1000,name:nm,pass:pw};
+  emailjs.send(EJS_SVC,EJS_TMPL,{to_email:em,user_name:nm,verification_code:code})
+    .then(function(){btn.disabled=false;btn.textContent="Send Verification Code";el("regS1").style.display="none";el("regS2").style.display="block";el("otpEmailDisplay").textContent=em;el("otpInput").value="";})
+    .catch(function(){btn.disabled=false;btn.textContent="Send Verification Code";err.textContent="Failed to send code. Try again.";err.style.display="block";});
+}
+function modalVerifyOTP(){
+  var em=el("regEmail").value.trim(),code=el("otpInput").value.trim();
+  var err=el("otpErr"); err.style.display="none";
+  if(!code||code.length!==6){err.textContent="Please enter the 6-digit code.";err.style.display="block";return;}
+  var s=otpStore[em];
+  if(!s){err.textContent="No code found. Please resend.";err.style.display="block";return;}
+  if(Date.now()>s.exp){err.textContent="Code expired. Please resend.";err.style.display="block";return;}
+  if(code!==s.code){err.textContent="Incorrect code. Try again.";err.style.display="block";return;}
+  var btn=el("verifyOTPBtn"); btn.disabled=true; btn.textContent="Creating account...";
+  var nm=s.name,pw=s.pass; delete otpStore[em];
+  auth.createUserWithEmailAndPassword(em,pw).then(function(c){return c.user.updateProfile({displayName:nm});}).then(function(){closeModal("authModal");}).catch(function(e){btn.disabled=false;btn.textContent="Verify and Create Account";err.textContent=e.code==="auth/email-already-in-use"?"Email already has an account. Please login.":e.message;err.style.display="block";});
+}
+function modalResendOTP(){
+  var em=el("regEmail").value.trim(),s=otpStore[em];
+  if(!s){el("otpErr").textContent="Please go back.";el("otpErr").style.display="block";return;}
+  var c=genOTP(); s.code=c; s.exp=Date.now()+15*60*1000;
+  emailjs.send(EJS_SVC,EJS_TMPL,{to_email:em,user_name:s.name,verification_code:c}).then(function(){el("otpErr").textContent="New code sent!";el("otpErr").style.color="#10b981";el("otpErr").style.display="block";}).catch(function(){el("otpErr").textContent="Failed to resend.";el("otpErr").style.display="block";});
+}
+function goBackS1(){el("regS1").style.display="block";el("regS2").style.display="none";}
+
+// Dashboard OTP
+function doSendOTP(){
+  var nm=el("dName").value.trim(),em=el("dRegEmail").value.trim(),pw=el("dRegPass").value;
+  var err=el("dRegErr"); err.style.display="none";
+  if(!nm||!em||!pw){err.textContent="Please fill in all fields.";err.style.display="block";return;}
+  if(pw.length<6){err.textContent="Password must be at least 6 characters.";err.style.display="block";return;}
+  var btn=el("dSendBtn"); btn.disabled=true; btn.textContent="Sending...";
+  var code=genOTP(); otpStore[em]={code:code,exp:Date.now()+15*60*1000,name:nm,pass:pw};
+  emailjs.send(EJS_SVC,EJS_TMPL,{to_email:em,user_name:nm,verification_code:code})
+    .then(function(){btn.disabled=false;btn.textContent="Send Verification Code";el("dRS1").style.display="none";el("dRS2").style.display="block";el("dOTPEmail").textContent=em;el("dOTPInput").value="";})
+    .catch(function(){btn.disabled=false;btn.textContent="Send Verification Code";err.textContent="Failed to send code.";err.style.display="block";});
+}
+function doVerifyOTP(){
+  var em=el("dRegEmail").value.trim(),code=el("dOTPInput").value.trim();
+  var err=el("dOTPErr"); err.style.display="none";
+  if(!code||code.length!==6){err.textContent="Please enter the 6-digit code.";err.style.display="block";return;}
+  var s=otpStore[em];
+  if(!s){err.textContent="No code found. Please resend.";err.style.display="block";return;}
+  if(Date.now()>s.exp){err.textContent="Code expired.";err.style.display="block";return;}
+  if(code!==s.code){err.textContent="Incorrect code.";err.style.display="block";return;}
+  var btn=el("dVerifyBtn"); btn.disabled=true; btn.textContent="Creating...";
+  var nm=s.name,pw=s.pass; delete otpStore[em];
+  auth.createUserWithEmailAndPassword(em,pw).then(function(c){return c.user.updateProfile({displayName:nm});}).catch(function(e){btn.disabled=false;btn.textContent="Verify and Create Account";err.textContent=e.code==="auth/email-already-in-use"?"Email already has an account. Please login.":e.message;err.style.display="block";});
+}
+function doResendOTP(){
+  var em=el("dRegEmail").value.trim(),s=otpStore[em];
+  if(!s){el("dOTPErr").textContent="Please go back.";el("dOTPErr").style.display="block";return;}
+  var c=genOTP(); s.code=c; s.exp=Date.now()+15*60*1000;
+  emailjs.send(EJS_SVC,EJS_TMPL,{to_email:em,user_name:s.name,verification_code:c}).then(function(){el("dOTPErr").textContent="New code sent!";el("dOTPErr").style.color="#10b981";el("dOTPErr").style.display="block";}).catch(function(){el("dOTPErr").textContent="Failed to resend.";el("dOTPErr").style.display="block";});
+}
+function dGoBack(){el("dRS1").style.display="block";el("dRS2").style.display="none";}
+
+// ============================================================
+// LOGOUT
+// ============================================================
+function logoutUser(){
+  detachAll();
+  auth.signOut().then(function(){
+    CU=null; closeDash();
+    el("abtns").style.display="flex"; el("mab").style.display="none";
+    el("preLogin").style.display="block"; el("dashLoggedIn").style.display="none";
+    el("dashEmailForm").style.display="none";
+    el("inlinePreLogin").style.display="block";
+    el("inlineLoggedIn").style.display="none";
+    showToast("Logged Out","See you soon!");
+  });
+}
+
+// ============================================================
+// CHANGE PASSWORD
+// ============================================================
+function initPasswordSection(){
+  if(!CU) return;
+  var isEmail=CU.providerData.some(function(p){return p.providerId==="password";});
+  el("pwEmailUI").style.display=isEmail?"block":"none";
+  el("pwGoogleUI").style.display=isEmail?"none":"block";
+  if(isEmail){el("pwCurrent").value="";el("pwNew").value="";el("pwConfirm").value="";el("pwErr").style.display="none";el("pwOk").style.display="none";}
+}
+function changePassword(){
+  var cur=el("pwCurrent").value, nw=el("pwNew").value, cf=el("pwConfirm").value;
+  var err=el("pwErr"),ok=el("pwOk"); err.style.display="none"; ok.style.display="none";
+  if(!cur){err.textContent="Please enter your current password.";err.style.display="block";return;}
+  if(nw.length<6){err.textContent="New password must be at least 6 characters.";err.style.display="block";return;}
+  if(nw!==cf){err.textContent="New passwords do not match.";err.style.display="block";return;}
+  if(cur===nw){err.textContent="New password must be different from current password.";err.style.display="block";return;}
+  var btn=el("pwSaveBtn"); btn.disabled=true; btn.textContent="Saving...";
+  var cred=firebase.auth.EmailAuthProvider.credential(CU.email,cur);
+  CU.reauthenticateWithCredential(cred).then(function(){return CU.updatePassword(nw);}).then(function(){
+    btn.disabled=false; btn.textContent="\uD83D\uDCBE Save New Password";
+    el("pwCurrent").value=""; el("pwNew").value=""; el("pwConfirm").value="";
+    ok.textContent="Password updated! Your new password is now active on "+CU.email+".";
+    ok.style.display="block";
+    showToast("Password Changed!","New password saved for "+CU.email);
+  }).catch(function(e){
+    btn.disabled=false; btn.textContent="\uD83D\uDCBE Save New Password";
+    err.textContent=e.code==="auth/wrong-password"||e.code==="auth/invalid-credential"?"Current password is incorrect.":e.code==="auth/too-many-requests"?"Too many attempts. Please wait.":e.code==="auth/weak-password"?"New password is too weak.":"Failed to update password.";
+    err.style.display="block";
+  });
+}
+
+// ============================================================
+// DASHBOARD PANEL
+// ============================================================
+function openDash(){
+  el("dashPanel").classList.add("open"); el("dashBackdrop").classList.add("open");
+  if(CU){el("preLogin").style.display="none";el("dashLoggedIn").style.display="block";}
+  else{el("preLogin").style.display="block";el("dashLoggedIn").style.display="none";}
+}
+function closeDash(){el("dashPanel").classList.remove("open");el("dashBackdrop").classList.remove("open");}
+function switchDash(s){
+  document.querySelectorAll(".dsec").forEach(function(x){x.classList.remove("active");});
+  document.querySelectorAll(".dnb").forEach(function(x){x.classList.remove("active");});
+  var sm={orders:"secOrders",transactions:"secTransactions",status:"secStatus",wallet:"secWallet",password:"secPassword"};
+  var bm={orders:"btnOrders",transactions:"btnTx",status:"btnStatus",wallet:"btnWallet",password:"btnPassword"};
+  if(sm[s]) el(sm[s]).classList.add("active");
+  if(bm[s]) el(bm[s]).classList.add("active");
+  if(s==="password") initPasswordSection();
+}
+function refreshDash(){showToast("Live!","All data is updating in real time automatically.");}
+
+// ============================================================
+// AUTH MODAL
+// ============================================================
+function openAuth(tab){el("loginErr").style.display="none";el("regErr").style.display="none";switchAuthTab(tab);openModal("authModal");}
+function switchAuthTab(t){el("loginForm").style.display=t==="login"?"block":"none";el("registerForm").style.display=t==="register"?"block":"none";el("tabLogin").classList.toggle("active",t==="login");el("tabRegister").classList.toggle("active",t==="register");}
+function showEmailForm(m){el("dashEmailForm").style.display="block";switchDashTab(m);}
+function hideEmailForm(){el("dashEmailForm").style.display="none";}
+function switchDashTab(t){el("dLoginForm").style.display=t==="login"?"block":"none";el("dRegForm").style.display=t==="register"?"block":"none";el("dTabLogin").classList.toggle("active",t==="login");el("dTabReg").classList.toggle("active",t==="register");}
+
+// ============================================================
+// SHOW ORDER MODAL (used after pending order login)
+// ============================================================
+function showOrderModal(){el("walletPayRow").style.display="none";el("cardOnlyRow").style.display="block";openModal("orderModal");}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id){el(id).classList.add("open");}
+function closeModal(id){el(id).classList.remove("open");}
+document.querySelectorAll(".mo").forEach(function(m){m.addEventListener("click",function(e){if(e.target===m)m.classList.remove("open");});});
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function togglePw(id,btn){var i=el(id);if(i.type==="password"){i.type="text";btn.textContent="Hide";}else{i.type="password";btn.textContent="Show";}}
+function toggleTheme(){var h=document.documentElement,d=h.getAttribute("data-theme")==="dark";h.setAttribute("data-theme",d?"light":"dark");el("thLabel").textContent=d?"Light":"Dark";}
+function toggleNav(){el("navLinks").classList.toggle("open");}
+function showPublic(){el("adminView").style.display="none";el("publicView").style.display="block";}
+function scrollToPlans(){showPublic();setTimeout(function(){el("plans").scrollIntoView({behavior:"smooth"});},100);}
+function switchTab(n){el("tabMTN").classList.toggle("active",n==="mtn");el("tabTEL").classList.toggle("active",n==="telecel");el("mtnPlans").classList.toggle("hidden",n!=="mtn");el("telPlans").classList.toggle("hidden",n!=="telecel");}
+function showToast(title,msg,dur){dur=dur||4000;el("toastTitle").textContent=title;el("toastMsg").textContent=msg;var t=el("toast");t.classList.add("show");setTimeout(function(){t.classList.remove("show");},dur);}
+
+// ============================================================
+// AI CHAT
+// ============================================================
+function sendChat(){
+  var inp=el("chatIn"),msg=inp.value.trim(); if(!msg) return;
+  var box=el("chatMsgs");
+  box.innerHTML+="<div class='cmsg mu'>"+msg+"</div>";
+  inp.value=""; box.scrollTop=box.scrollHeight;
+  setTimeout(function(){
+    var m=msg.toLowerCase(),r="I understand your concern. Please drop your Order ID and our team will respond promptly. Thank you.";
+    if(m.includes("hello")||m.includes("hi")) r="Hello! How may I help you today?";
+    else if(m.includes("report")||m.includes("issue")||m.includes("problem")) r="To report an order, go to Dashboard \u2192 Orders tab and click the Report button. It sends a WhatsApp message to our team instantly.";
+    else if(m.includes("deliver")||m.includes("data")||m.includes("bundle")) r="Sorry to hear that! Please use the Report button on your order in the Dashboard. Our team will be notified instantly via WhatsApp.";
+    else if(m.includes("payment")||m.includes("paid")) r="For payment issues, please share your Order ID and transaction reference. Our team will investigate promptly.";
+    else if(m.includes("balance")||m.includes("wallet")) r="Check your wallet balance in the Dashboard \u2192 Wallet tab. Dial *170# for MTN or *100# for Telecel to check data balance.";
+    box.innerHTML+="<div class='cmsg mai'>"+r+"</div>"; box.scrollTop=box.scrollHeight;
+  },600);
+}
+
+// ============================================================
+// KEYBOARD
+// =================================================================================
+el("chatIn").addEventListener("keydown",function(e){if(e.key==="Enter")sendChat();});
+el("adminKeyInput").addEventListener("keydown",function(e){if(e.key==="Enter")verifyAdmin();});
+</script>
+</body>
+</html>
