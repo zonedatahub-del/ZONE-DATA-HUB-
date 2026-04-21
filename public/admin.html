@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Zone Data Hub — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+:root{--bg:#06080f;--bg2:#0d1120;--bg3:#111827;--card:rgba(255,255,255,0.04);--cb:rgba(255,255,255,0.08);--text:#f0f4ff;--t2:#8b98b8;--ac:#00d4ff;--ac2:#7c3aed;--ac3:#f59e0b;--r:16px;--tr:0.3s cubic-bezier(0.4,0,0.2,1);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.bg-wrap{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+.bg-wrap::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(0,212,255,0.06),transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(124,58,237,0.06),transparent 60%);}
+
+/* LOGIN SCREEN */
+#login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem;}
+.login-box{background:var(--bg2);border:1px solid var(--cb);border-radius:20px;padding:2.5rem;width:100%;max-width:400px;position:relative;z-index:1;}
+.login-logo{font-family:"Orbitron",sans-serif;font-weight:900;font-size:1.2rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem;}
+.login-title{font-family:"Syne",sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:0.3rem;}
+.login-sub{color:var(--t2);font-size:0.85rem;margin-bottom:2rem;}
+.fl{font-size:0.82rem;font-weight:600;color:var(--t2);margin-bottom:0.3rem;display:block;}
+.fi{width:100%;padding:0.75rem 1rem;border-radius:10px;background:var(--bg3);border:1px solid var(--cb);color:var(--text);font-family:"DM Sans",sans-serif;font-size:0.95rem;outline:none;transition:border-color var(--tr);margin-bottom:1rem;}
+.fi:focus{border-color:var(--ac);}
+.btn-login{width:100%;padding:0.9rem;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--ac3),#ef4444);color:#000;font-weight:700;font-size:1rem;font-family:"DM Sans",sans-serif;}
+.btn-login:hover{opacity:0.9;}
+.err-msg{color:#ef4444;font-size:0.82rem;margin-bottom:0.75rem;display:none;}
+
+/* ADMIN PANEL */
+#admin-panel{display:none;position:relative;z-index:1;}
+nav.admin-nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:65px;display:flex;align-items:center;justify-content:space-between;padding:0 5%;background:rgba(6,8,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--cb);}
+.nav-logo{font-family:"Orbitron",sans-serif;font-weight:900;font-size:1rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-tag{font-size:0.7rem;font-weight:700;color:var(--ac3);letter-spacing:2px;margin-top:0.1rem;}
+.nav-right{display:flex;align-items:center;gap:1rem;}
+.btn{padding:0.5rem 1.2rem;border-radius:9px;border:none;cursor:pointer;font-family:"DM Sans",sans-serif;font-size:0.88rem;font-weight:600;transition:all var(--tr);}
+.btn-danger{background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.2);}
+.btn-danger:hover{background:#ef4444;color:#fff;}
+.btn-refresh{background:var(--card);border:1px solid var(--cb);color:var(--text);}
+.btn-refresh:hover{border-color:var(--ac);color:var(--ac);}
+
+.admin-body{padding:80px 5% 60px;max-width:1400px;margin:0 auto;}
+.admin-header{margin-bottom:2rem;}
+.admin-header h1{font-family:"Syne",sans-serif;font-size:2rem;font-weight:900;}
+.admin-header p{color:var(--t2);margin-top:0.3rem;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;}
+.stat-card{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:1.2rem;}
+.stat-label{font-size:0.72rem;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;}
+.stat-value{font-family:"Orbitron",sans-serif;font-size:1.8rem;font-weight:700;color:var(--ac);}
+.stat-value.green{color:#10b981;}
+.stat-value.amber{color:var(--ac3);}
+.stat-value.red{color:#ef4444;}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;}
+.filter-btn{padding:0.45rem 1rem;border-radius:8px;border:1px solid var(--cb);background:transparent;color:var(--t2);cursor:pointer;font-size:0.82rem;font-weight:600;font-family:"DM Sans",sans-serif;transition:all var(--tr);}
+.filter-btn.active,.filter-btn:hover{background:var(--ac);color:#000;border-color:transparent;}
+.search-inp{padding:0.5rem 1rem;border-radius:8px;background:var(--bg3);border:1px solid var(--cb);color:var(--text);font-family:"DM Sans",sans-serif;font-size:0.85rem;outline:none;min-width:200px;}
+.search-inp:focus{border-color:var(--ac);}
+
+/* TABLE */
+.tbl-wrap{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);overflow:hidden;}
+.tbl-hdr{padding:1rem 1.2rem;border-bottom:1px solid var(--cb);display:flex;justify-content:space-between;align-items:center;}
+.tbl-hdr-title{font-family:"Syne",sans-serif;font-weight:700;}
+.tbl-count{font-size:0.8rem;color:var(--t2);}
+.tbl-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{padding:0.7rem 0.9rem;text-align:left;font-size:0.75rem;color:var(--t2);border-bottom:1px solid var(--cb);white-space:nowrap;}
+td{padding:0.7rem 0.9rem;font-size:0.82rem;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.badge{padding:0.2rem 0.6rem;border-radius:20px;font-size:0.7rem;font-weight:700;white-space:nowrap;}
+.badge-pend{background:rgba(245,158,11,0.15);color:var(--ac3);}
+.badge-proc{background:rgba(0,212,255,0.15);color:var(--ac);}
+.badge-del{background:rgba(16,185,129,0.15);color:#10b981;}
+.tbl-action{padding:0.3rem 0.7rem;border-radius:6px;border:none;cursor:pointer;font-size:0.75rem;font-weight:700;font-family:"DM Sans",sans-serif;transition:all var(--tr);}
+.btn-deliver{background:rgba(16,185,129,0.15);color:#10b981;}
+.btn-deliver:hover{background:#10b981;color:#fff;}
+.no-orders{text-align:center;color:var(--t2);padding:3rem;font-size:0.9rem;}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;background:var(--bg2);border:1px solid var(--cb);border-radius:12px;padding:0.9rem 1.4rem;max-width:320px;box-shadow:0 8px 30px rgba(0,0,0,0.3);display:none;cursor:pointer;}
+.toast.show{display:block;}
+.toast-title{font-weight:700;font-size:0.9rem;margin-bottom:0.2rem;}
+.toast-msg{font-size:0.82rem;color:var(--t2);}
+
+@media(max-width:768px){
+  .admin-body{padding:75px 4% 40px;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .filter-bar{gap:0.5rem;}
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap"></div>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">&#x2B21; ZONE DATA HUB</div>
+    <div class="login-title">Admin Access</div>
+    <div class="login-sub">Enter your admin key to continue.</div>
+    <div class="err-msg" id="login-err">Incorrect admin key. Please try again.</div>
+    <label class="fl">Admin Key</label>
+    <input type="password" class="fi" id="admin-key-inp" placeholder="Enter admin key"/>
+    <button class="btn-login" onclick="verifyAdmin()">&#x1F510; Access Admin Panel</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <nav class="admin-nav">
+    <div>
+      <div class="nav-logo">&#x2B21; ZONE DATA HUB</div>
+      <div class="nav-tag">ADMIN PANEL</div>
+    </div>
+    <div class="nav-right">
+      <button class="btn btn-refresh" onclick="loadOrders()">&#x1F504; Refresh</button>
+      <button class="btn btn-danger" onclick="logoutAdmin()">&#x1F6AA; Exit</button>
+    </div>
+  </nav>
+
+  <div class="admin-body">
+    <div class="admin-header">
+      <h1>Dashboard</h1>
+      <p>Manage all orders. Mark as delivered to notify the customer.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value amber" id="stat-pending">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Processing</div>
+        <div class="stat-value" id="stat-processing">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Delivered</div>
+        <div class="stat-value green" id="stat-delivered">—</div>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <button class="filter-btn active" id="f-all"       onclick="filterOrders('all')">All</button>
+      <button class="filter-btn"        id="f-pending"   onclick="filterOrders('Pending')">Pending</button>
+      <button class="filter-btn"        id="f-processing"onclick="filterOrders('Processing')">Processing</button>
+      <button class="filter-btn"        id="f-delivered" onclick="filterOrders('Delivered')">Delivered</button>
+      <input  class="search-inp" id="search-inp" placeholder="Search order ID or customer..." oninput="filterOrders(currentFilter)"/>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="tbl-wrap">
+      <div class="tbl-hdr">
+        <span class="tbl-hdr-title">&#x1F4E6; Orders</span>
+        <span class="tbl-count" id="tbl-count"></span>
+      </div>
+      <div class="tbl-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Package</th>
+              <th>Phone</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Payment</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody">
+            <tr><td colspan="9" class="no-orders">Loading orders...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" onclick="this.classList.remove('show')">
+  <div class="toast-title" id="toast-title"></div>
+  <div class="toast-msg" id="toast-msg"></div>
+</div>
+
+<script>
+// ── FIREBASE ─────────────────────────────────────────────────
+firebase.initializeApp({
+  apiKey:"AIzaSyAvL4ikdDGdY-FO9HTnLXHd5s81l840zec",
+  authDomain:"zone-data-hub.firebaseapp.com",
+  projectId:"zone-data-hub",
+  storageBucket:"zone-data-hub.firebasestorage.app",
+  messagingSenderId:"415813127941",
+  appId:"1:415813127941:web:1d6f1b8cab1f3fef1d716c"
+});
+var db=firebase.firestore();
+
+// ── CONSTANTS ────────────────────────────────────────────────
+var ADMIN_KEY_HASH="184b0a9d7ad6f7472111dae56cf2741572931e7b206638c2a4f559161f8f8a70";
+var WA="233531861148";
+var allOrders=[];
+var currentFilter="all";
+
+// ── ADMIN LOGIN ──────────────────────────────────────────────
+document.getElementById("admin-key-inp").addEventListener("keydown",function(e){
+  if(e.key==="Enter") verifyAdmin();
+});
+
+function verifyAdmin(){
+  var k=document.getElementById("admin-key-inp").value;
+  var err=document.getElementById("login-err");
+  err.style.display="none";
+  var enc=new TextEncoder();
+  crypto.subtle.digest("SHA-256",enc.encode(k)).then(function(buf){
+    var hex=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0");}).join("");
+    if(hex===ADMIN_KEY_HASH){
+      document.getElementById("login-screen").style.display="none";
+      document.getElementById("admin-panel").style.display="block";
+      loadOrders();
+    } else {
+      err.style.display="block";
+      document.getElementById("admin-key-inp").value="";
+    }
+  });
+}
+
+function logoutAdmin(){
+  document.getElementById("admin-panel").style.display="none";
+  document.getElementById("admin-key-inp").value="";
+  document.getElementById("login-screen").style.display="flex";
+}
+
+// ── LOAD ORDERS ──────────────────────────────────────────────
+function loadOrders(){
+  document.getElementById("orders-tbody").innerHTML=
+    "<tr><td colspan='9' class='no-orders'>Loading...</td></tr>";
+  db.collection("orders").orderBy("createdAt","desc").get()
+    .then(function(snap){
+      allOrders=[];
+      snap.forEach(function(d){allOrders.push(Object.assign({id:d.id},d.data()));});
+      updateStats();
+      renderOrders(allOrders);
+    })
+    .catch(function(e){
+      showToast("Error","Could not load orders: "+e.message);
+    });
+}
+
+// ── STATS ────────────────────────────────────────────────────
+function updateStats(){
+  var total=allOrders.length;
+  var pending=allOrders.filter(function(o){return o.status==="Pending";}).length;
+  var processing=allOrders.filter(function(o){return o.status==="Processing";}).length;
+  var delivered=allOrders.filter(function(o){return o.status==="Delivered";}).length;
+  document.getElementById("stat-total").textContent=total;
+  document.getElementById("stat-pending").textContent=pending;
+  document.getElementById("stat-processing").textContent=processing;
+  document.getElementById("stat-delivered").textContent=delivered;
+}
+
+// ── FILTER ───────────────────────────────────────────────────
+function filterOrders(status){
+  currentFilter=status;
+  // Update filter buttons
+  ["all","pending","processing","delivered"].forEach(function(id){
+    document.getElementById("f-"+id).classList.remove("active");
+  });
+  var btnId=status==="all"?"all":status.toLowerCase();
+  if(document.getElementById("f-"+btnId)){
+    document.getElementById("f-"+btnId).classList.add("active");
+  }
+  // Apply filter + search
+  var search=document.getElementById("search-inp").value.toLowerCase().trim();
+  var filtered=allOrders.filter(function(o){
+    var matchStatus=status==="all"||(o.status||"")==status;
+    var matchSearch=!search||
+      (o.orderId||"").toLowerCase().includes(search)||
+      (o.customerEmail||"").toLowerCase().includes(search)||
+      (o.recipientPhone||"").toLowerCase().includes(search)||
+      (o.network||"").toLowerCase().includes(search);
+    return matchStatus&&matchSearch;
+  });
+  renderOrders(filtered);
+}
+
+// ── RENDER TABLE ─────────────────────────────────────────────
+function renderOrders(rows){
+  document.getElementById("tbl-count").textContent=rows.length+" order"+(rows.length!==1?"s":"");
+  if(!rows.length){
+    document.getElementById("orders-tbody").innerHTML=
+      "<tr><td colspan='9' class='no-orders'>No orders found.</td></tr>";
+    return;
+  }
+  document.getElementById("orders-tbody").innerHTML=rows.map(function(o){
+    var bc=o.status==="Delivered"?"badge-del":o.status==="Processing"?"badge-proc":"badge-pend";
+    var action=o.status==="Delivered"
+      ?"<span style='color:#10b981;font-weight:700;'>&#x2713; Done</span>"
+      :"<button class='tbl-action btn-deliver' onclick=\"markDelivered('"+
+        o.orderId+"','"+( o.customerUid||"")+"','"+o.recipientPhone+"','"+
+        o.package+"','"+o.network+"')\">Mark Delivered</button>";
+    return "<tr>"+
+      "<td style='font-size:0.72rem;font-family:monospace;'>"+o.orderId+"</td>"+
+      "<td>"+(o.customerEmail||"—")+"</td>"+
+      "<td>"+o.network+" "+o.package+"</td>"+
+      "<td>"+o.recipientPhone+"</td>"+
+      "<td style='color:var(--ac);font-weight:700;'>"+o.price+"</td>"+
+      "<td>"+o.date+"</td>"+
+      "<td>"+(o.paymentMethod||"Paystack")+"</td>"+
+      "<td><span class='badge "+bc+"'>"+o.status+"</span></td>"+
+      "<td>"+action+"</td>"+
+      "</tr>";
+  }).join("");
+}
+
+// ── MARK DELIVERED ───────────────────────────────────────────
+function markDelivered(oid,uid,phone,pkg,net){
+  var b=db.batch();
+  b.update(db.collection("orders").doc(oid),{status:"Delivered"});
+  if(uid) b.update(db.collection("users").doc(uid).collection("orders").doc(oid),{status:"Delivered"});
+  b.commit().then(function(){
+    showToast("Delivered!",oid+" marked as delivered.");
+    // Update local data so UI refreshes instantly
+    allOrders.forEach(function(o){if(o.orderId===oid) o.status="Delivered";});
+    updateStats();
+    filterOrders(currentFilter);
+    // Notify customer on WhatsApp
+    window.open("https://wa.me/233"+phone.slice(1)+"?text="+encodeURIComponent(
+      "ZONE DATA HUB\n\nYour "+net+" "+pkg+" has been sent to ("+phone+").\n\nThank you for choosing Zone Data Hub!"
+    ),"_blank");
+  }).catch(function(e){
+    showToast("Error","Could not mark as delivered: "+e.message);
+  });
+}
+
+// ── TOAST ────────────────────────────────────────────────────
+function showToast(title,msg){
+  var t=document.getElementById("toast");
+  document.getElementById("toast-title").textContent=title;
+  document.getElementById("toast-msg").textContent=msg;
+  t.classList.add("show");
+  clearTimeout(t._tid);
+  t._tid=setTimeout(function(){t.classList.remove("show");},4000);
+}
+</script>
+</body>
+</html>
