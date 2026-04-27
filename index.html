@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hope for Kidneys: Funding Advanced Research | GoFundMe</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #00b964; --green-dark: #009e55; --green-light: #e6f8f0;
+    --text: #1e1e1e; --muted: #6b7280; --border: #e5e7eb;
+    --bg: #f9fafb; --white: #ffffff;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Nunito Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  nav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 26px; color: var(--green); letter-spacing: -0.5px; text-decoration: none; cursor: pointer; border: none; background: none; }
+  .logo span { color: var(--text); }
+  .nav-actions { display: flex; gap: 12px; align-items: center; }
+  .btn-nav { padding: 9px 20px; border-radius: 24px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-nav.outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+  .btn-nav.outline:hover { border-color: #aaa; background: var(--bg); }
+  .btn-nav.solid { background: var(--green); color: white; }
+  .btn-nav.solid:hover { background: var(--green-dark); }
+  .nav-search { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 24px; padding: 8px 16px; font-size: 14px; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+  .nav-search:hover { border-color: #aaa; background: #f0f0f0; }
+
+  .breadcrumb { max-width: 1200px; margin: 16px auto 0; padding: 0 24px; font-size: 13px; color: var(--muted); }
+  .breadcrumb a { color: var(--muted); text-decoration: none; cursor: pointer; }
+  .breadcrumb a:hover { color: var(--green); text-decoration: underline; }
+  .breadcrumb span { margin: 0 6px; }
+
+  .sub-nav { background: white; border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 64px; z-index: 90; }
+  .sub-nav-inner { max-width: 1200px; margin: 0 auto; display: flex; }
+  .sub-nav-item { padding: 14px 20px; font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Nunito Sans', sans-serif; }
+  .sub-nav-item:hover { color: var(--text); }
+  .sub-nav-item.active { color: var(--green-dark); border-bottom: 3px solid var(--green); }
+
+  .main { max-width: 1200px; margin: 20px auto 60px; padding: 0 24px; display: grid; grid-template-columns: 1fr 380px; gap: 32px; align-items: start; }
+
+  .left h1 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 28px; line-height: 1.25; margin-bottom: 12px; }
+  .category-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--green-light); color: var(--green-dark); font-size: 13px; font-weight: 700; padding: 5px 12px; border-radius: 20px; margin-bottom: 16px; cursor: pointer; transition: background 0.2s; }
+  .category-badge:hover { background: #c6f0de; }
+
+  .hero-img { width: 100%; border-radius: 16px; overflow: hidden; margin-bottom: 20px; position: relative; height: 400px; background: linear-gradient(135deg, #0f2c5e 0%, #1a4a8a 40%, #c0392b 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  .hero-kidney-icon { font-size: 80px; margin-bottom: 16px; filter: drop-shadow(0 4px 24px rgba(0,0,0,0.4)); animation: pulse 2.5s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+  .hero-text-overlay { text-align: center; color: white; padding: 0 32px; }
+  .hero-text-overlay h2 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 22px; margin-bottom: 8px; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+  .hero-text-overlay p { font-size: 14px; opacity: 0.9; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+  .img-ribbon { position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.3); color: white; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 12px; }
+
+  .organizer-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 14px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #1a4a8a, #c0392b); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 18px; flex-shrink: 0; font-family: 'Nunito', sans-serif; cursor: pointer; transition: transform 0.2s; border: none; }
+  .avatar:hover { transform: scale(1.08); }
+  .organizer-info { flex: 1; }
+  .organizer-info strong { font-size: 14px; font-weight: 700; display: block; cursor: pointer; }
+  .organizer-info strong:hover { color: var(--green-dark); }
+  .organizer-info small { font-size: 12px; color: var(--muted); }
+  .share-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: white; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .share-btn:hover { border-color: var(--green); color: var(--green); }
+
+  .story-section h3 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 20px; margin-bottom: 16px; }
+  .story-body p { font-size: 15px; line-height: 1.75; color: #374151; margin-bottom: 16px; }
+  .story-body strong { font-weight: 700; color: var(--text); }
+  .highlight-box { background: var(--green-light); border-left: 4px solid var(--green); padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 15px; color: #065f46; font-weight: 600; line-height: 1.6; }
+  .read-more-btn { background: none; border: none; color: var(--green-dark); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; padding: 0; margin-top: 4px; text-decoration: underline; }
+
+  .updates-section { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border); }
+  .updates-section h3 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 20px; margin-bottom: 20px; }
+  .update-card { display: flex; gap: 14px; margin-bottom: 8px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 8px; transition: background 0.15s; padding: 12px 8px; }
+  .update-card:hover { background: var(--bg); }
+  .update-card:last-child { border-bottom: none; }
+  .update-date { font-size: 12px; color: var(--muted); flex-shrink: 0; width: 70px; padding-top: 2px; text-align: right; }
+  .update-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); flex-shrink: 0; margin-top: 5px; }
+  .update-body strong { font-size: 14px; font-weight: 700; }
+  .update-body p { font-size: 14px; color: #4b5563; margin-top: 4px; line-height: 1.6; }
+
+  .comments-section { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border); }
+  .comments-section h3 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 20px; margin-bottom: 20px; }
+  .comment { display: flex; gap: 12px; margin-bottom: 8px; padding: 12px; border-radius: 10px; transition: background 0.15s; cursor: pointer; }
+  .comment:hover { background: var(--bg); }
+  .comment-avatar { width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: white; font-family: 'Nunito', sans-serif; }
+  .comment-body .name { font-size: 14px; font-weight: 700; }
+  .comment-body .amount { font-size: 13px; color: var(--green-dark); font-weight: 600; }
+  .comment-body .message { font-size: 14px; color: #4b5563; margin-top: 4px; line-height: 1.5; }
+  .comment-body .time { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .leave-comment-btn { width: 100%; padding: 13px; border: 2px dashed var(--border); border-radius: 10px; background: none; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; color: var(--muted); cursor: pointer; transition: all 0.2s; margin-top: 8px; }
+  .leave-comment-btn:hover { border-color: var(--green); color: var(--green-dark); background: var(--green-light); }
+
+  .sticky-card { position: sticky; top: 130px; }
+  .donation-card { background: var(--white); border-radius: 16px; box-shadow: var(--shadow); padding: 28px; border: 1px solid var(--border); }
+  .raised-amount { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 32px; line-height: 1; }
+  .goal-of { font-size: 16px; color: var(--muted); margin-top: 4px; font-weight: 600; }
+  .progress-bar-track { width: 100%; height: 8px; background: #e5e7eb; border-radius: 99px; margin: 16px 0 12px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--green), #00d97e); width: 0%; transition: width 1.4s cubic-bezier(0.25, 1, 0.5, 1); }
+  .stats-row { display: flex; gap: 20px; font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+  .stats-row strong { color: var(--text); font-weight: 700; }
+  .btn-donate { width: 100%; padding: 16px; background: var(--green); color: white; border: none; border-radius: 12px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 18px; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
+  .btn-donate:hover { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,185,100,0.3); }
+  .btn-share-main { width: 100%; padding: 14px; background: white; color: var(--text); border: 2px solid var(--border); border-radius: 12px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; }
+  .btn-share-main:hover { border-color: var(--green); color: var(--green); }
+  .gfm-guarantee { display: flex; align-items: flex-start; gap: 10px; background: var(--bg); border-radius: 10px; padding: 14px; margin-bottom: 20px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+  .gfm-guarantee:hover { background: var(--green-light); border-color: var(--green); }
+  .gfm-guarantee .icon { font-size: 20px; flex-shrink: 0; }
+  .gfm-guarantee p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .gfm-guarantee p strong { color: var(--text); font-weight: 700; }
+  .top-donors h4 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .donor-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; cursor: pointer; padding: 6px; border-radius: 8px; transition: background 0.15s; }
+  .donor-row:hover { background: var(--bg); }
+  .donor-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: white; flex-shrink: 0; font-family: 'Nunito', sans-serif; }
+  .donor-info { flex: 1; }
+  .donor-info .dname { font-size: 13px; font-weight: 700; }
+  .donor-info .ddetail { font-size: 12px; color: var(--muted); }
+  .donor-amount { font-size: 14px; font-weight: 800; }
+  .see-all-btn { width: 100%; padding: 10px; background: none; border: 2px solid var(--border); border-radius: 8px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; color: var(--text); margin-top: 6px; transition: all 0.2s; }
+  .see-all-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+
+  /* MODALS */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal { background: white; border-radius: 20px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); animation: slideUp 0.25s cubic-bezier(0.34,1.56,0.64,1); max-height: 90vh; overflow-y: auto; }
+  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .modal-header h3 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 22px; }
+  .modal-close { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--bg); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0; }
+  .modal-close:hover { background: var(--border); }
+
+  .amount-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 20px; }
+  .amount-opt { padding: 14px 8px; border: 2px solid var(--border); border-radius: 10px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; cursor: pointer; transition: all 0.15s; background: white; }
+  .amount-opt:hover { border-color: var(--green); color: var(--green); }
+  .amount-opt.selected { border-color: var(--green); background: var(--green-light); color: var(--green-dark); }
+  .amount-opt small { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+  .amount-opt.selected small { color: var(--green-dark); }
+  .custom-input-wrap { position: relative; margin-bottom: 20px; }
+  .custom-input-wrap span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-weight: 800; font-size: 18px; color: var(--muted); }
+  .custom-input { width: 100%; padding: 14px 14px 14px 30px; border: 2px solid var(--border); border-radius: 10px; font-size: 18px; font-family: 'Nunito', sans-serif; font-weight: 800; outline: none; transition: border 0.2s; }
+  .custom-input:focus { border-color: var(--green); }
+  .modal-label { font-size: 13px; font-weight: 700; margin-bottom: 8px; display: block; color: var(--muted); }
+  .tip-row { display: flex; align-items: center; gap: 12px; background: var(--bg); border-radius: 10px; padding: 12px 14px; margin-bottom: 20px; font-size: 14px; }
+  .tip-row input { width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
+  .tip-row label { flex: 1; cursor: pointer; line-height: 1.4; }
+  .btn-continue { width: 100%; padding: 16px; background: var(--green); color: white; border: none; border-radius: 12px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 17px; cursor: pointer; transition: background 0.2s; }
+  .btn-continue:hover { background: var(--green-dark); }
+  .modal-footer-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+
+  .share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .share-option { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; transition: all 0.2s; background: white; }
+  .share-option:hover { transform: translateY(-1px); }
+  .share-option.fb { color:#1877f2; } .share-option.fb:hover { background:#e7f0ff; border-color:#1877f2; }
+  .share-option.tw { color:#000; } .share-option.tw:hover { background:#f0f0f0; border-color:#000; }
+  .share-option.wa { color:#25d366; } .share-option.wa:hover { background:#e6faf0; border-color:#25d366; }
+  .share-option.em { color:#6b7280; } .share-option.em:hover { background:var(--bg); border-color:#6b7280; }
+  .share-option .sicon { font-size: 22px; }
+  .copy-link-row { display: flex; gap: 10px; }
+  .copy-link-input { flex: 1; padding: 12px 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 13px; color: var(--muted); background: var(--bg); outline: none; }
+  .copy-link-btn { padding: 12px 20px; background: var(--green); color: white; border: none; border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+  .copy-link-btn:hover { background: var(--green-dark); }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+  .form-input { width: 100%; padding: 13px 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 15px; font-family: 'Nunito Sans', sans-serif; outline: none; transition: border 0.2s; }
+  .form-input:focus { border-color: var(--green); }
+  .btn-full-green { width: 100%; padding: 15px; background: var(--green); color: white; border: none; border-radius: 12px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+  .btn-full-green:hover { background: var(--green-dark); }
+  .divider { text-align: center; font-size: 13px; color: var(--muted); margin: 16px 0; position: relative; }
+  .divider::before, .divider::after { content:''; position: absolute; top: 50%; width: 42%; height: 1px; background: var(--border); }
+  .divider::before { left: 0; } .divider::after { right: 0; }
+  .btn-social-login { width: 100%; padding: 12px; background: white; border: 2px solid var(--border); border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; transition: all 0.2s; }
+  .btn-social-login:hover { border-color: #aaa; background: var(--bg); }
+  .modal-switch-text { text-align: center; font-size: 13px; color: var(--muted); margin-top: 16px; }
+  .modal-switch-text a { color: var(--green-dark); font-weight: 700; cursor: pointer; text-decoration: none; }
+  .modal-switch-text a:hover { text-decoration: underline; }
+  .forgot-link { text-align: right; font-size: 13px; color: var(--green-dark); font-weight: 700; cursor: pointer; margin-top: -8px; margin-bottom: 16px; }
+  .forgot-link:hover { text-decoration: underline; }
+
+  .campaign-types { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .campaign-type { padding: 18px 14px; border: 2px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; font-family: 'Nunito', sans-serif; background: white; }
+  .campaign-type:hover { border-color: var(--green); background: var(--green-light); }
+  .campaign-type.selected { border-color: var(--green); background: var(--green-light); }
+  .campaign-type .ct-icon { font-size: 30px; margin-bottom: 8px; }
+  .campaign-type strong { display: block; font-size: 14px; font-weight: 800; }
+  .campaign-type small { font-size: 12px; color: var(--muted); }
+
+  .guarantee-list { list-style: none; padding: 0; margin: 16px 0 24px; }
+  .guarantee-list li { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; line-height: 1.5; }
+  .guarantee-list li:last-child { border-bottom: none; }
+  .guarantee-list li .gi { font-size: 20px; flex-shrink: 0; }
+
+  .search-input-wrap { display: flex; gap: 10px; margin-bottom: 20px; }
+  .search-input { flex: 1; padding: 13px 16px; border: 2px solid var(--border); border-radius: 10px; font-size: 15px; font-family: 'Nunito Sans', sans-serif; outline: none; transition: border 0.2s; }
+  .search-input:focus { border-color: var(--green); }
+  .search-go-btn { padding: 13px 20px; background: var(--green); color: white; border: none; border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+  .search-go-btn:hover { background: var(--green-dark); }
+  .search-result { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; cursor: pointer; transition: background 0.15s; }
+  .search-result:hover { background: var(--bg); }
+  .sr-icon { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .sr-title { font-size: 14px; font-weight: 700; }
+  .sr-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .search-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+
+  .org-profile { text-align: center; padding: 10px 0 20px; }
+  .big-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg,#1a4a8a,#c0392b); display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 32px; margin: 0 auto 16px; font-family: 'Nunito', sans-serif; }
+  .org-profile h4 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 20px; margin-bottom: 6px; }
+  .org-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--green-light); color: var(--green-dark); font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+  .org-stats { display: flex; justify-content: center; gap: 32px; margin: 16px 0; }
+  .org-stat strong { display: block; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 22px; }
+  .org-stat span { font-size: 12px; color: var(--muted); }
+  .org-profile p { font-size: 14px; color: #374151; line-height: 1.6; text-align: left; }
+
+  .comment-textarea { width: 100%; padding: 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 15px; font-family: 'Nunito Sans', sans-serif; outline: none; resize: vertical; min-height: 100px; transition: border 0.2s; margin-bottom: 16px; }
+  .comment-textarea:focus { border-color: var(--green); }
+  .anon-row { display: flex; align-items: center; gap: 10px; font-size: 14px; margin-bottom: 20px; }
+  .anon-row input { width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
+
+  .modal-two-btn { display: flex; gap: 12px; margin-top: 20px; }
+  .modal-two-btn .btn-outline { flex: 1; padding: 14px; border: 2px solid var(--border); border-radius: 12px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; background: white; transition: all 0.2s; }
+  .modal-two-btn .btn-outline:hover { border-color: var(--green); color: var(--green); }
+  .modal-two-btn .btn-full-green { flex: 1; }
+
+  .toast { display: none; position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #1e1e1e; color: white; padding: 12px 24px; border-radius: 99px; font-size: 14px; font-weight: 700; z-index: 300; box-shadow: 0 4px 20px rgba(0,0,0,0.3); white-space: nowrap; }
+
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; gap: 24px; }
+    .sticky-card { position: static; }
+    .nav-search, .btn-nav.outline { display: none; }
+    .left h1 { font-size: 22px; }
+    .raised-amount { font-size: 26px; }
+    .share-grid, .campaign-types { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-inner">
+    <button class="logo" onclick="scrollToTop()">Go<span>Fund</span>Me</button>
+    <div class="nav-search" onclick="openModal('searchModal')">🔍 Search campaigns</div>
+    <div class="nav-actions">
+      <button class="btn-nav outline" onclick="openModal('signinModal')">Sign in</button>
+      <button class="btn-nav solid" onclick="openModal('startModal')">Start a GoFundMe</button>
+    </div>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a onclick="scrollToTop()">Home</a><span>›</span>
+  <a onclick="scrollToSection('storySection')">Medical</a><span>›</span>
+  Hope for Kidneys: Funding Advanced Kidney Research
+</div>
+
+<!-- SUB-NAV -->
+<div class="sub-nav">
+  <div class="sub-nav-inner">
+    <button class="sub-nav-item active" onclick="setTab(this); scrollToSection('storySection')">Story</button>
+    <button class="sub-nav-item" onclick="setTab(this); scrollToSection('updatesSection')">Updates (3)</button>
+    <button class="sub-nav-item" onclick="setTab(this); scrollToSection('donorsSection')">Donors (142)</button>
+    <button class="sub-nav-item" onclick="setTab(this); openModal('shareModal')">Share</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="left">
+    <div class="category-badge" onclick="showToast('📂 Browsing Medical Research campaigns...')">🏥 Medical Research</div>
+    <h1>Hope for Kidneys: Funding Advanced Kidney Disease Research</h1>
+
+    <div class="hero-img">
+      <div class="img-ribbon">📍 Nationwide · USA</div>
+      <div class="hero-kidney-icon">🫘</div>
+      <div class="hero-text-overlay">
+        <h2>Every Kidney Deserves a Fighting Chance</h2>
+        <p>Join 142 donors already making a difference in kidney disease research</p>
+      </div>
+    </div>
+
+    <div class="organizer-bar">
+      <button class="avatar" onclick="openModal('orgModal')">KF</button>
+      <div class="organizer-info">
+        <strong onclick="openModal('orgModal')">Kidney Foundation Research Group</strong>
+        <small>📋 Organizer · 🌍 United States · ✅ Identity verified</small>
+      </div>
+      <button class="share-btn" onclick="openModal('shareModal')">↗ Share</button>
+    </div>
+
+    <!-- STORY -->
+    <div class="story-section" id="storySection">
+      <h3>Our Story</h3>
+      <div class="story-body">
+        <p><strong>Every 30 minutes, someone is diagnosed with chronic kidney disease in the United States.</strong> That's over 37 million Americans currently living with CKD — many of whom don't know it until the disease is already in its advanced stages. Kidney disease is the 9th leading cause of death in the U.S., and dialysis is grueling, expensive, and not a cure.</p>
+        <div class="highlight-box">💡 Over 800,000 Americans are on dialysis or living with a kidney transplant. Without better research, this number will continue to climb.</div>
+        <p>Our team has developed a non-invasive biomarker screening method that could identify CKD up to <strong>8 years earlier</strong> than current diagnostic tools. We are raising funds to complete Phase 2 clinical trials. Your contribution goes toward:</p>
+        <p>🔬 <strong>Lab testing & specimen analysis</strong><br>🏥 <strong>Hospital partnership fees</strong><br>💻 <strong>AI-assisted diagnostic modeling</strong><br>📚 <strong>Publishing & peer review</strong></p>
+        <p>We've already received matching grants, meaning <strong>every dollar you give is amplified</strong>. We need to reach $85,000 through public donations to unlock those funds.</p>
+        <button class="read-more-btn" id="readMoreBtn" onclick="expandStory()">Read more ↓</button>
+        <div id="extraStory" style="display:none;">
+          <p>No one should lose a loved one to a disease that could have been caught earlier. Our lead researcher, Dr. Amara Mensah, lost her mother to stage 5 CKD when she was 19. That loss fueled a career dedicated to making sure others don't face the same grief.</p>
+          <p>We are a registered 501(c)(3) nonprofit. 100% of net proceeds go toward research. Our financials are publicly audited annually and we provide quarterly updates to every donor.</p>
+          <p><strong>Thank you for believing that better science leads to better lives.</strong> Share this page — even a single share can change the trajectory of this research.</p>
+          <button class="read-more-btn" onclick="collapseStory()">Show less ↑</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPDATES -->
+    <div class="updates-section" id="updatesSection">
+      <h3>🔔 Updates (3)</h3>
+      <div class="update-card" onclick="openUpdateDetail('🎉 We hit 50% of our goal!','Thanks to 142 incredible donors, we have crossed $42,500. Our matching grant is nearly triggered. We are overwhelmed by your generosity. The team is fully energized and every dollar brings us closer to completing Phase 2 trials. Keep sharing!','Apr 20, 2026')">
+        <div class="update-date">Apr 20<br>2026</div>
+        <div class="update-dot"></div>
+        <div class="update-body"><strong>🎉 We hit 50% of our goal!</strong><p>Thanks to 142 incredible donors, we've crossed $42,500. Our matching grant is nearly triggered. Keep sharing!</p></div>
+      </div>
+      <div class="update-card" onclick="openUpdateDetail('🏥 Hospital Partnership Confirmed','University Medical Center has officially signed on as our third trial site. Recruitment for Phase 2 begins in May. We now have access to a diverse patient cohort across three major hospital networks — a critical milestone in our research.','Apr 10, 2026')">
+        <div class="update-date">Apr 10<br>2026</div>
+        <div class="update-dot"></div>
+        <div class="update-body"><strong>🏥 Hospital Partnership Confirmed</strong><p>University Medical Center signed on as our third trial site. Recruitment for Phase 2 begins in May.</p></div>
+      </div>
+      <div class="update-card" onclick="openUpdateDetail('🚀 Campaign Launched!','We are officially live! Thank you to everyone who shared in our first 48 hours. We raised $8,000 on day one — an incredible start. Every share and donation brings us closer to better kidney disease detection for millions of patients worldwide.','Mar 28, 2026')">
+        <div class="update-date">Mar 28<br>2026</div>
+        <div class="update-dot"></div>
+        <div class="update-body"><strong>🚀 Campaign Launched!</strong><p>We're officially live! We raised $8,000 on day one — an incredible start to this journey.</p></div>
+      </div>
+    </div>
+
+    <!-- DONORS -->
+    <div class="comments-section" id="donorsSection">
+      <h3>💬 Words of Support</h3>
+      <div class="comment" onclick="showToast('💬 Liked Sandra R.\'s comment')">
+        <div class="comment-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">SR</div>
+        <div class="comment-body">
+          <div class="name">Sandra R. <span class="amount">· $250</span></div>
+          <div class="message">"My father was on dialysis for 6 years. Research like this matters more than words can say."</div>
+          <div class="time">3 days ago</div>
+        </div>
+      </div>
+      <div class="comment" onclick="showToast('💬 Liked James M.\'s comment')">
+        <div class="comment-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">JM</div>
+        <div class="comment-body">
+          <div class="name">James M. <span class="amount">· $100</span></div>
+          <div class="message">"Early detection is everything. Proud to support this work. Shared with my whole network!"</div>
+          <div class="time">5 days ago</div>
+        </div>
+      </div>
+      <div class="comment" onclick="showToast('💬 Liked Aisha N.\'s comment')">
+        <div class="comment-avatar" style="background:linear-gradient(135deg,#10b981,#059669);">AN</div>
+        <div class="comment-body">
+          <div class="name">Aisha N. <span class="amount">· $500</span></div>
+          <div class="message">"As a nephrologist, I see the impact of late-stage CKD every day. This research is urgently needed."</div>
+          <div class="time">1 week ago</div>
+        </div>
+      </div>
+      <div class="comment" onclick="showToast('💬 Liked Thomas K.\'s comment')">
+        <div class="comment-avatar" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);">TK</div>
+        <div class="comment-body">
+          <div class="name">Thomas K. <span class="amount">· $50</span></div>
+          <div class="message">"Not much but I hope it helps. Stay strong team!"</div>
+          <div class="time">1 week ago</div>
+        </div>
+      </div>
+      <button class="leave-comment-btn" onclick="openModal('commentModal')">✏️ Leave a word of support</button>
+    </div>
+  </div>
+
+  <!-- RIGHT CARD -->
+  <div class="sticky-card">
+    <div class="donation-card">
+      <div class="raised-amount">$53,230.00</div>
+      <div class="goal-of">raised of <strong>$85,000</strong> goal</div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <div class="stats-row">
+        <div><strong>142</strong> donors</div>
+        <div><strong>11</strong> days left</div>
+        <div style="color:var(--green-dark);font-weight:700;">🔥 Trending</div>
+      </div>
+      <button class="btn-donate" onclick="openModal('donateModal')">❤️ Donate now</button>
+      <button class="btn-share-main" onclick="openModal('shareModal')">↗ Share this campaign</button>
+      <div class="gfm-guarantee" onclick="openModal('guaranteeModal')">
+        <div class="icon">🛡️</div>
+        <p><strong>GoFundMe Giving Guarantee</strong> — If something seems wrong, we'll refund your donation. Tap to learn more.</p>
+      </div>
+      <div class="top-donors">
+        <h4>Top donors</h4>
+        <div class="donor-row" onclick="scrollToSection('donorsSection'); showToast('👑 Aisha N. — Top donor $500')">
+          <div class="donor-avatar" style="background:linear-gradient(135deg,#f59e0b,#f97316);">1</div>
+          <div class="donor-info"><div class="dname">Aisha N.</div><div class="ddetail">First donation · 1 week ago</div></div>
+          <div class="donor-amount">$500</div>
+        </div>
+        <div class="donor-row" onclick="scrollToSection('donorsSection'); showToast('Anonymous donor — $300')">
+          <div class="donor-avatar" style="background:linear-gradient(135deg,#94a3b8,#64748b);">2</div>
+          <div class="donor-info"><div class="dname">Anonymous</div><div class="ddetail">4 days ago</div></div>
+          <div class="donor-amount">$300</div>
+        </div>
+        <div class="donor-row" onclick="scrollToSection('donorsSection'); showToast('Sandra R. — $250')">
+          <div class="donor-avatar" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);">3</div>
+          <div class="donor-info"><div class="dname">Sandra R.</div><div class="ddetail">3 days ago</div></div>
+          <div class="donor-amount">$250</div>
+        </div>
+        <div class="donor-row" onclick="scrollToSection('donorsSection'); showToast('Dr. Patel Foundation — $200')">
+          <div class="donor-avatar" style="background:linear-gradient(135deg,#34d399,#059669);">4</div>
+          <div class="donor-info"><div class="dname">Dr. Patel Foundation</div><div class="ddetail">2 days ago</div></div>
+          <div class="donor-amount">$200</div>
+        </div>
+        <button class="see-all-btn" onclick="scrollToSection('donorsSection')">See all 142 donors ↓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ MODALS ════════ -->
+
+<!-- DONATE -->
+<div class="modal-overlay" id="donateModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Choose an amount</h3><button class="modal-close" onclick="closeModal('donateModal')">✕</button></div>
+    <div class="amount-options">
+      <button class="amount-opt selected" onclick="selectAmount(this,200)">$200<small>5 biomarker tests</small></button>
+      <button class="amount-opt" onclick="selectAmount(this,350)">$350<small>Sponsors 3 patient days</small></button>
+      <button class="amount-opt" onclick="selectAmount(this,500)">$500<small>AI model training</small></button>
+      <button class="amount-opt" onclick="selectAmount(this,750)">$750<small>Lab specimen batch</small></button>
+      <button class="amount-opt" onclick="selectAmount(this,1000)">$1,000<small>Full week of trials</small></button>
+      <button class="amount-opt" onclick="selectAmount(this,2000)">$2,000<small>Phase 2 milestone</small></button>
+    </div>
+    <span class="modal-label">Or enter a custom amount</span>
+    <div class="custom-input-wrap"><span>$</span><input type="number" class="custom-input" id="customAmount" placeholder="Other amount" min="1" oninput="clearSelection()" /></div>
+    <div class="tip-row"><input type="checkbox" id="tipCheck" checked /><label for="tipCheck">Add a <strong>10% tip</strong> to help GoFundMe provide services for free to fundraisers in need.</label></div>
+    <button class="btn-continue" onclick="triggerTechIssue()">Continue →</button>
+    <div class="modal-footer-note">🔒 Secured by GoFundMe · Powered by Stripe</div>
+  </div>
+</div>
+
+<!-- SHARE -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Share this campaign</h3><button class="modal-close" onclick="closeModal('shareModal')">✕</button></div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.6;">Sharing is the #1 way campaigns reach their goals.</p>
+    <div class="share-grid">
+      <button class="share-option fb" onclick="showToast('📘 Opening Facebook share...')"><span class="sicon">📘</span> Facebook</button>
+      <button class="share-option tw" onclick="showToast('🐦 Opening X / Twitter share...')"><span class="sicon">🐦</span> X / Twitter</button>
+      <button class="share-option wa" onclick="showToast('💬 Opening WhatsApp share...')"><span class="sicon">💬</span> WhatsApp</button>
+      <button class="share-option em" onclick="showToast('📧 Opening email share...')"><span class="sicon">📧</span> Email</button>
+    </div>
+    <div class="modal-label" style="margin-bottom:10px;">Or copy the link</div>
+    <div class="copy-link-row">
+      <input class="copy-link-input" id="copyLinkInput" value="gofundme.com/f/hope-for-kidneys-research" readonly />
+      <button class="copy-link-btn" onclick="copyLink()">Copy</button>
+    </div>
+    <div style="margin-top:16px;padding:12px;background:var(--green-light);border-radius:10px;font-size:13px;color:var(--green-dark);font-weight:600;line-height:1.5;">💚 Campaigns that are shared raise <strong>4x more</strong> on average. Every share matters!</div>
+  </div>
+</div>
+
+<!-- SIGN IN -->
+<div class="modal-overlay" id="signinModal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="signinTitle">Sign in to GoFundMe</h3><button class="modal-close" onclick="closeModal('signinModal')">✕</button></div>
+    <div id="signinForm">
+      <div class="form-group"><label>Email address</label><input type="email" class="form-input" placeholder="you@example.com" /></div>
+      <div class="form-group"><label>Password</label><input type="password" class="form-input" placeholder="Enter your password" /></div>
+      <div class="forgot-link" onclick="showToast('📧 Password reset link sent to your email!')">Forgot password?</div>
+      <button class="btn-full-green" onclick="closeModal('signinModal'); showToast('✅ Signed in successfully! Welcome back.')">Sign in</button>
+      <div class="divider">or</div>
+      <button class="btn-social-login" onclick="showToast('🔵 Signing in with Google...')">🔵 Continue with Google</button>
+      <button class="btn-social-login" onclick="showToast('📘 Signing in with Facebook...')">📘 Continue with Facebook</button>
+      <div class="modal-switch-text">Don't have an account? <a onclick="showSignup()">Sign up free</a></div>
+    </div>
+    <div id="signupForm" style="display:none;">
+      <div class="form-group"><label>First name</label><input type="text" class="form-input" placeholder="John" /></div>
+      <div class="form-group"><label>Last name</label><input type="text" class="form-input" placeholder="Doe" /></div>
+      <div class="form-group"><label>Email address</label><input type="email" class="form-input" placeholder="you@example.com" /></div>
+      <div class="form-group"><label>Password</label><input type="password" class="form-input" placeholder="Create a password" /></div>
+      <button class="btn-full-green" onclick="closeModal('signinModal'); showToast('🎉 Account created! Welcome to GoFundMe!')">Create account</button>
+      <div class="modal-switch-text">Already have an account? <a onclick="showSignin()">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- START CAMPAIGN -->
+<div class="modal-overlay" id="startModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Start your GoFundMe</h3><button class="modal-close" onclick="closeModal('startModal')">✕</button></div>
+    <p style="font-size:14px;color:var(--muted);line-height:1.6;">What are you raising money for?</p>
+    <div class="campaign-types">
+      <div class="campaign-type" onclick="selectCampaignType(this)"><div class="ct-icon">🏥</div><strong>Medical</strong><small>Illness, treatment costs</small></div>
+      <div class="campaign-type" onclick="selectCampaignType(this)"><div class="ct-icon">💔</div><strong>Memorial</strong><small>Funeral, celebrate a life</small></div>
+      <div class="campaign-type" onclick="selectCampaignType(this)"><div class="ct-icon">🏠</div><strong>Emergency</strong><small>Disaster, housing, crisis</small></div>
+      <div class="campaign-type" onclick="selectCampaignType(this)"><div class="ct-icon">🎓</div><strong>Education</strong><small>Tuition, scholarships</small></div>
+      <div class="campaign-type" onclick="selectCampaignType(this)"><div class="ct-icon">🐾</div><strong>Animals</strong><small>Vet bills, rescue</small></div>
+      <div class="campaign-type" onclick="selectCampaignType(this)"><div class="ct-icon">✨</div><strong>Other</strong><small>Anything else</small></div>
+    </div>
+    <button class="btn-full-green" onclick="closeModal('startModal'); openModal('signinModal'); showToast('Sign in or create an account to start your campaign!')">Continue →</button>
+    <div class="modal-footer-note" style="margin-top:14px;">GoFundMe charges 0% platform fees. Payment processing fees apply.</div>
+  </div>
+</div>
+
+<!-- GUARANTEE -->
+<div class="modal-overlay" id="guaranteeModal">
+  <div class="modal">
+    <div class="modal-header"><h3>🛡️ Giving Guarantee</h3><button class="modal-close" onclick="closeModal('guaranteeModal')">✕</button></div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:8px;line-height:1.6;">We protect every single donor on our platform:</p>
+    <ul class="guarantee-list">
+      <li><span class="gi">✅</span><div><strong>Full refund if something goes wrong</strong> — If you donated to a fraudulent campaign or the fundraiser doesn't use funds as promised, we'll refund your donation.</div></li>
+      <li><span class="gi">🔒</span><div><strong>Secure payment processing</strong> — All transactions are encrypted and processed by Stripe, one of the world's most trusted payment platforms.</div></li>
+      <li><span class="gi">🕵️</span><div><strong>Campaign verification</strong> — Our trust &amp; safety team reviews campaigns 24/7 to detect and remove fraud before it affects donors.</div></li>
+      <li><span class="gi">📞</span><div><strong>24/7 donor support</strong> — Our team is always available to process refund requests quickly.</div></li>
+    </ul>
+    <button class="btn-full-green" onclick="closeModal('guaranteeModal'); showToast('✅ You\'re fully protected by GoFundMe!')">Got it, I'm protected</button>
+  </div>
+</div>
+
+<!-- UPDATE DETAIL -->
+<div class="modal-overlay" id="updateModal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="updateTitle">Update</h3><button class="modal-close" onclick="closeModal('updateModal')">✕</button></div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;" id="updateDate"></p>
+    <p style="font-size:15px;line-height:1.75;color:#374151;" id="updateBody"></p>
+    <div class="modal-two-btn">
+      <button class="btn-full-green" onclick="closeModal('updateModal'); openModal('donateModal')">❤️ Donate now</button>
+      <button class="btn-outline" onclick="closeModal('updateModal'); openModal('shareModal')">↗ Share</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORGANIZER -->
+<div class="modal-overlay" id="orgModal">
+  <div class="modal">
+    <div class="modal-header"><h3>About the Organizer</h3><button class="modal-close" onclick="closeModal('orgModal')">✕</button></div>
+    <div class="org-profile">
+      <div class="big-avatar">KF</div>
+      <h4>Kidney Foundation Research Group</h4>
+      <div class="org-badge">✅ Identity Verified</div>
+      <div class="org-stats">
+        <div class="org-stat"><strong>3</strong><span>Campaigns</span></div>
+        <div class="org-stat"><strong>$142K</strong><span>Total raised</span></div>
+        <div class="org-stat"><strong>4.9 ★</strong><span>Trust score</span></div>
+      </div>
+      <p>The Kidney Foundation Research Group is a registered 501(c)(3) nonprofit founded in 2019 by Dr. Amara Mensah, a nephrologist and biomedical researcher. Our mission is to fund early-detection kidney disease research that saves lives. We operate with full financial transparency — annual audits are publicly available.</p>
+    </div>
+    <div class="modal-two-btn">
+      <button class="btn-full-green" onclick="closeModal('orgModal'); openModal('donateModal')">❤️ Support their work</button>
+      <button class="btn-outline" onclick="closeModal('orgModal'); showToast('📧 Message sent to organizer!')">✉️ Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="modal-overlay" id="searchModal">
+  <div class="modal">
+    <div class="modal-header"><h3>🔍 Search Campaigns</h3><button class="modal-close" onclick="closeModal('searchModal')">✕</button></div>
+    <div class="search-input-wrap">
+      <input class="search-input" id="searchInput" placeholder="Search for campaigns..." />
+      <button class="search-go-btn" onclick="doSearch()">Search</button>
+    </div>
+    <div class="search-label">Trending campaigns</div>
+    <div class="search-result" onclick="closeModal('searchModal'); scrollToTop(); showToast('Viewing: Hope for Kidneys Research')">
+      <div class="sr-icon" style="background:var(--green-light);">🫘</div>
+      <div><div class="sr-title">Hope for Kidneys: Funding Advanced Research</div><div class="sr-meta">$42,780 raised · Medical · 142 donors</div></div>
+    </div>
+    <div class="search-result" onclick="showToast('Opening: Children\'s Cancer Research Fund...')">
+      <div class="sr-icon" style="background:#fef3c7;">🎗️</div>
+      <div><div class="sr-title">Children's Cancer Research Fund</div><div class="sr-meta">$98,210 raised · Medical · 891 donors</div></div>
+    </div>
+    <div class="search-result" onclick="showToast('Opening: Wildfire Recovery Relief...')">
+      <div class="sr-icon" style="background:#fee2e2;">🔥</div>
+      <div><div class="sr-title">Wildfire Recovery Relief — California</div><div class="sr-meta">$210,440 raised · Emergency · 2.1K donors</div></div>
+    </div>
+    <div class="search-result" onclick="showToast('Opening: Veterans Mental Health Initiative...')">
+      <div class="sr-icon" style="background:#e0e7ff;">🎖️</div>
+      <div><div class="sr-title">Veterans Mental Health Initiative</div><div class="sr-meta">$55,670 raised · Community · 320 donors</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMENT -->
+<div class="modal-overlay" id="commentModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Leave a word of support</h3><button class="modal-close" onclick="closeModal('commentModal')">✕</button></div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.5;">Your message will appear publicly on this campaign page.</p>
+    <div class="form-group"><label>Your name</label><input type="text" class="form-input" id="commentName" placeholder="Your full name" /></div>
+    <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px;">Your message</div>
+    <textarea class="comment-textarea" id="commentText" placeholder="Write something encouraging..."></textarea>
+    <div class="anon-row"><input type="checkbox" id="anonCheck" /><label for="anonCheck">Post anonymously</label></div>
+    <button class="btn-full-green" onclick="postComment()">Post message</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── SCROLL ──
+  function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) { const top = el.getBoundingClientRect().top + window.scrollY - 140; window.scrollTo({ top, behavior: 'smooth' }); }
+  }
+  function setTab(el) {
+    document.querySelectorAll('.sub-nav-item').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ── MODAL ──
+  function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
+  function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = ''; }
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', function(e) { if (e.target === this) { this.classList.remove('active'); document.body.style.overflow = ''; } });
+  });
+
+  // ── DONATE ──
+  let selectedAmount = 200;
+  function selectAmount(el, amt) { document.querySelectorAll('.amount-opt').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); selectedAmount = amt; document.getElementById('customAmount').value = ''; }
+  function clearSelection() { document.querySelectorAll('.amount-opt').forEach(b => b.classList.remove('selected')); selectedAmount = null; }
+  function triggerTechIssue() {
+    closeModal('donateModal');
+    setTimeout(() => {
+      showToast('⚠️ Technical issue. Please try again later.');
+    }, 300);
+  }
+  function simulateDonate() {
+    const custom = parseFloat(document.getElementById('customAmount').value);
+    const amount = custom || selectedAmount || 200;
+    closeModal('donateModal');
+    setTimeout(() => showToast('💚 Thank you! Your $' + amount.toFixed(0) + ' donation means the world to us!'), 300);
+  }
+
+  // ── SHARE ──
+  function copyLink() { const v = document.getElementById('copyLinkInput').value; navigator.clipboard?.writeText(v).catch(()=>{}); showToast('🔗 Link copied to clipboard!'); }
+
+  // ── SIGN IN / UP ──
+  function showSignup() { document.getElementById('signinTitle').textContent = 'Create an account'; document.getElementById('signinForm').style.display = 'none'; document.getElementById('signupForm').style.display = 'block'; }
+  function showSignin() { document.getElementById('signinTitle').textContent = 'Sign in to GoFundMe'; document.getElementById('signinForm').style.display = 'block'; document.getElementById('signupForm').style.display = 'none'; }
+
+  // ── CAMPAIGN TYPE ──
+  function selectCampaignType(el) { document.querySelectorAll('.campaign-type').forEach(t => t.classList.remove('selected')); el.classList.add('selected'); }
+
+  // ── UPDATE DETAIL ──
+  function openUpdateDetail(title, body, date) { document.getElementById('updateTitle').textContent = title; document.getElementById('updateBody').textContent = body; document.getElementById('updateDate').textContent = '📅 Posted ' + date; openModal('updateModal'); }
+
+  // ── STORY ──
+  function expandStory() { document.getElementById('extraStory').style.display = 'block'; document.getElementById('readMoreBtn').style.display = 'none'; }
+  function collapseStory() { document.getElementById('extraStory').style.display = 'none'; document.getElementById('readMoreBtn').style.display = 'inline'; }
+
+  // ── SEARCH ──
+  function doSearch() { const q = document.getElementById('searchInput').value.trim(); if (q) showToast('🔍 Searching for "' + q + '"...'); }
+  document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+  // ── COMMENT ──
+  function postComment() {
+    const name = document.getElementById('commentName').value.trim();
+    const text = document.getElementById('commentText').value.trim();
+    const anon = document.getElementById('anonCheck').checked;
+    if (!text) { showToast('⚠️ Please write a message first.'); return; }
+    const display = anon ? 'Anonymous' : (name || 'A supporter');
+    closeModal('commentModal');
+    setTimeout(() => showToast('✅ Message from ' + display + ' was posted!'), 300);
+  }
+
+  // ── TOAST ──
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block';
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.style.display = 'none'; }, 3200);
+  }
+
+  // ── PROGRESS BAR ──
+  window.addEventListener('load', () => { setTimeout(() => { document.getElementById('progressFill').style.width = '62.6%'; }, 500); });
+</script>
+</body>
+</html>
